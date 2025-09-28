@@ -1,5 +1,8 @@
 import { createSupabaseServer } from "@/lib/supabase-server";
 
+// 動的レンダリングを強制（認証状態に依存）
+export const dynamic = 'force-dynamic';
+
 export default async function AlbumDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = createSupabaseServer();

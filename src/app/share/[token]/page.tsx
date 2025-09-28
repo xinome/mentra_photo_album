@@ -1,5 +1,8 @@
 import Image from "next/image";
 
+// 動的レンダリングを強制（環境変数とAPIに依存）
+export const dynamic = 'force-dynamic';
+
 type Photo = {
   id: string;
   signed_url: string;

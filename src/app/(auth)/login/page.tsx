@@ -2,6 +2,9 @@
 import { supabase } from "@/lib/supabase";
 import { useState } from "react";
 
+// 動的レンダリングを強制（プリレンダリングを無効化）
+export const dynamic = 'force-dynamic';
+
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);

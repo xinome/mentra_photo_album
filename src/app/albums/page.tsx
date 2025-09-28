@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { createSupabaseServer } from "@/lib/supabase-server";
 
+// 動的レンダリングを強制（認証状態に依存）
+export const dynamic = 'force-dynamic';
+
 export default async function AlbumsPage() {
   const supabase = createSupabaseServer();
   const { data: { user } } = await supabase.auth.getUser();
