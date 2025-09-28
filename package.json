@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "supabase": "export SUPABASE_ACCESS_TOKEN=sbp_89281200da2525c59a9afbe08016f5d748df1e38 && npx supabase",
+    "supabase:status": "export SUPABASE_ACCESS_TOKEN=sbp_89281200da2525c59a9afbe08016f5d748df1e38 && npx supabase status",
+    "supabase:projects": "export SUPABASE_ACCESS_TOKEN=sbp_89281200da2525c59a9afbe08016f5d748df1e38 && npx supabase projects list",
+    "supabase:types": "export SUPABASE_ACCESS_TOKEN=sbp_89281200da2525c59a9afbe08016f5d748df1e38 && npx supabase gen types typescript --linked > src/types/supabase.ts"
   },
   "dependencies": {
     "@supabase/auth-helpers-nextjs": "^0.10.0",
