@@ -1,22 +1,22 @@
 import { createSupabaseServer } from "@/lib/supabase-server";
-import Image from "next/image";
 
-export default async function AlbumDetail({ params }: { params: { id: string }}) {
+export default async function AlbumDetail({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const supabase = createSupabaseServer();
-  const { data: album } = await supabase.from("albums").select("*").eq("id", params.id).single();
-  const { data: photos } = await supabase.from("photos").select("id,storage_key,caption").eq("album_id", params.id).order("created_at");
+  const { data: album } = await supabase.from("albums").select("*").eq("id", id).single();
+  const { data: photos } = await supabase.from("photos").select("id,storage_key,caption").eq("album_id", id).order("created_at");
 
   return (
     <main className="mx-auto max-w-4xl p-6 space-y-4">
       <h1 className="text-xl font-semibold">{album?.title}</h1>
       {/* アップロード */}
-      <form action={uploadImage.bind(null, params.id)}>
+      <form action={uploadImage.bind(null, id)}>
         <input type="file" accept="image/*" name="file" />
         <button className="ml-2 rounded bg-black text-white px-3 py-1">追加</button>
       </form>
 
       {/* 共有リンク */}
-      <form action={createShare.bind(null, params.id)}>
+      <form action={createShare.bind(null, id)}>
         <button className="rounded border px-3 py-1">共有リンク発行</button>
       </form>
 
