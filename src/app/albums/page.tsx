@@ -64,14 +64,22 @@ export default function AlbumsPage() {
   return (
     <AuthGuard requireAuth={true} redirectTo="/login">
       <main className="mx-auto max-w-3xl p-6">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-4">
           <h1 className="text-xl font-semibold">アルバム</h1>
-          <button 
-            onClick={createAlbum}
-            className="rounded bg-black text-white px-3 py-2"
-          >
-            新規作成
-          </button>
+          <div className="flex gap-2">
+            <a 
+              href="/account" 
+              className="rounded bg-gray-600 text-white px-3 py-2 hover:bg-gray-700"
+            >
+              アカウント設定
+            </a>
+            <button 
+              onClick={createAlbum}
+              className="rounded bg-black text-white px-3 py-2"
+            >
+              新規作成
+            </button>
+          </div>
         </div>
         <ul className="mt-6 space-y-2">
           {albums?.map(a => (
