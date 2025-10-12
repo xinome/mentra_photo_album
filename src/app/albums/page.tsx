@@ -1,20 +1,35 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { AuthGuard } from "@/components/AuthGuard";
 import { useAuth } from "@/components/AuthProvider";
 import { supabase } from "@/lib/supabase";
 import { useEffect, useState } from "react";
+import { Dashboard } from "@/components/Dashboard";
+import { Header } from "@/components/Header";
 
-interface Album {
+interface DbAlbum {
   id: string;
   title: string;
   updated_at: string;
+  description?: string;
+}
+
+interface DashboardAlbum {
+  id: string;
+  title: string;
+  description: string;
+  coverImage: string;
+  photoCount: number;
+  createdAt: string;
+  category: "wedding" | "event" | "family" | "sports" | "other";
+  isShared: boolean;
 }
 
 export default function AlbumsPage() {
   const { user } = useAuth();
-  const [albums, setAlbums] = useState<Album[]>([]);
+  const router = useRouter();
+  const [albums, setAlbums] = useState<DashboardAlbum[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,15 +38,53 @@ export default function AlbumsPage() {
       
       console.log("AlbumsPage: ユーザー情報", user);
       
-      const { data: albums, error } = await supabase
+      const { data: albumsData, error } = await supabase
         .from("albums")
-        .select("id,title,updated_at")
+        .select("id,title,updated_at,description")
         .order("updated_at", { ascending: false });
 
-      console.log("AlbumsPage: アルバム取得結果", { albums, error });
+      console.log("AlbumsPage: アルバム取得結果", { albumsData, error });
       
-      if (albums) {
-        setAlbums(albums);
+      if (albumsData) {
+        // 各アルバムの写真数を取得
+        const albumsWithDetails = await Promise.all(
+          albumsData.map(async (album: DbAlbum) => {
+            const { count } = await supabase
+              .from("photos")
+              .select("id", { count: "exact", head: true })
+              .eq("album_id", album.id);
+
+            // カバー画像を取得（最初の写真）
+            const { data: photos } = await supabase
+              .from("photos")
+              .select("storage_key")
+              .eq("album_id", album.id)
+              .limit(1);
+
+            let coverImage = "https://images.unsplash.com/photo-1587955793432-7c4ff80918ba?w=400";
+            if (photos && photos.length > 0) {
+              const { data: signedUrl } = await supabase.storage
+                .from("photos")
+                .createSignedUrl(photos[0].storage_key, 3600);
+              if (signedUrl) {
+                coverImage = signedUrl.signedUrl;
+              }
+            }
+
+            return {
+              id: album.id,
+              title: album.title,
+              description: album.description || "アルバムの説明",
+              coverImage,
+              photoCount: count || 0,
+              createdAt: album.updated_at,
+              category: "other" as const,
+              isShared: false, // TODO: 共有情報を取得
+            };
+          })
+        );
+        
+        setAlbums(albumsWithDetails);
       }
       setLoading(false);
     };
@@ -39,18 +92,45 @@ export default function AlbumsPage() {
     fetchAlbums();
   }, [user]);
 
-  const createAlbum = async () => {
+  const handleCreateAlbum = async () => {
     if (!user) return;
     
     const { data, error } = await supabase
       .from("albums")
-      .insert({ title: "新しいアルバム", owner_id: user.id })
+      .insert({ 
+        title: "新しいアルバム",
+        description: "アルバムの説明を追加してください",
+        owner_id: user.id 
+      })
       .select();
 
     if (data && data[0]) {
-      setAlbums(prev => [data[0], ...prev]);
+      // 新しいアルバムをリストに追加
+      const newAlbum: DashboardAlbum = {
+        id: data[0].id,
+        title: data[0].title,
+        description: data[0].description || "アルバムの説明",
+        coverImage: "https://images.unsplash.com/photo-1587955793432-7c4ff80918ba?w=400",
+        photoCount: 0,
+        createdAt: data[0].updated_at,
+        category: "other",
+        isShared: false,
+      };
+      setAlbums(prev => [newAlbum, ...prev]);
+      
+      // アルバム詳細ページに遷移
+      router.push(`/albums/${data[0].id}`);
     }
     console.log("アルバム作成結果", { data, error });
+  };
+
+  const handleOpenAlbum = (albumId: string) => {
+    router.push(`/albums/${albumId}`);
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push("/login");
   };
 
   if (loading) {
@@ -63,34 +143,22 @@ export default function AlbumsPage() {
 
   return (
     <AuthGuard requireAuth={true} redirectTo="/login">
-      <main className="mx-auto max-w-3xl p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-xl font-semibold">アルバム</h1>
-          <div className="flex gap-2">
-            <a 
-              href="/account" 
-              className="rounded bg-gray-600 text-white px-3 py-2 hover:bg-gray-700"
-            >
-              アカウント設定
-            </a>
-            <button 
-              onClick={createAlbum}
-              className="rounded bg-black text-white px-3 py-2"
-            >
-              新規作成
-            </button>
-          </div>
-        </div>
-        <ul className="mt-6 space-y-2">
-          {albums?.map(a => (
-            <li key={a.id}>
-              <Link className="block border rounded p-3 hover:bg-gray-50" href={`/albums/${a.id}`}>
-                {a.title}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </main>
+      <div className="min-h-screen bg-background">
+        {user && (
+          <Header 
+            user={{
+              name: user.email?.split("@")[0] || "ユーザー",
+              email: user.email || "",
+            }}
+            onLogout={handleLogout}
+          />
+        )}
+        <Dashboard
+          albums={albums}
+          onCreateAlbum={handleCreateAlbum}
+          onOpenAlbum={handleOpenAlbum}
+        />
+      </div>
     </AuthGuard>
   );
 }

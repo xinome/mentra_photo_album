@@ -1,70 +1,210 @@
-import { createSupabaseServer } from "@/lib/supabase-server";
+"use client";
 
-// 動的レンダリングを強制（認証状態に依存）
-export const dynamic = 'force-dynamic';
+import { useRouter, useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
+import { AlbumViewer } from "@/components/AlbumViewer";
+import { Header } from "@/components/Header";
+import { useAuth } from "@/components/AuthProvider";
 
-export default async function AlbumDetail({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const supabase = createSupabaseServer();
-  const { data: album } = await supabase.from("albums").select("*").eq("id", id).single();
-  const { data: photos } = await supabase.from("photos").select("id,storage_key,caption").eq("album_id", id).order("created_at");
+interface DbPhoto {
+  id: string;
+  storage_key: string;
+  caption: string | null;
+  created_at: string;
+}
 
-  return (
-    <main className="mx-auto max-w-4xl p-6 space-y-4">
-      <h1 className="text-xl font-semibold">{album?.title}</h1>
-      {/* アップロード */}
-      <form action={uploadImage.bind(null, id)}>
-        <input type="file" accept="image/*" name="file" />
-        <button className="ml-2 rounded bg-black text-white px-3 py-1">追加</button>
-      </form>
+interface Photo {
+  id: string;
+  url: string;
+  thumbnail: string;
+  title?: string;
+  uploadedBy: {
+    name: string;
+    avatar?: string;
+  };
+  uploadedAt: string;
+  likes: number;
+  isLiked: boolean;
+}
 
-      {/* 共有リンク */}
-      <form action={createShare.bind(null, id)}>
-        <button className="rounded border px-3 py-1">共有リンク発行</button>
-      </form>
+interface Album {
+  id: string;
+  title: string;
+  description: string;
+  coverImage: string;
+  photos: Photo[];
+  createdAt: string;
+  category: "wedding" | "event" | "family" | "sports" | "other";
+  isShared: boolean;
+  contributors: Array<{
+    name: string;
+    avatar?: string;
+  }>;
+}
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-        {photos?.map((p) => (
-          <Photo key={p.id} storageKey={p.storage_key} />
-        ))}
+export default function AlbumDetailPage() {
+  const router = useRouter();
+  const params = useParams();
+  const { user } = useAuth();
+  const id = params.id as string;
+  
+  const [album, setAlbum] = useState<Album | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAlbumData = async () => {
+      if (!id) return;
+
+      // アルバム情報を取得
+      const { data: albumData, error: albumError } = await supabase
+        .from("albums")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (albumError || !albumData) {
+        console.error("アルバム取得エラー:", albumError);
+        setLoading(false);
+        return;
+      }
+
+      // 写真を取得
+      const { data: photosData, error: photosError } = await supabase
+        .from("photos")
+        .select("id,storage_key,caption,created_at")
+        .eq("album_id", id)
+        .order("created_at");
+
+      console.log("写真取得結果:", { photosData, photosError });
+
+      // 各写真のURLを取得
+      const photos: Photo[] = await Promise.all(
+        (photosData || []).map(async (photo: DbPhoto) => {
+          const { data: signedUrl } = await supabase.storage
+            .from("photos")
+            .createSignedUrl(photo.storage_key, 3600);
+
+          return {
+            id: photo.id,
+            url: signedUrl?.signedUrl || "",
+            thumbnail: signedUrl?.signedUrl || "",
+            title: photo.caption || undefined,
+            uploadedBy: {
+              name: user?.email?.split("@")[0] || "ユーザー",
+            },
+            uploadedAt: photo.created_at,
+            likes: 0,
+            isLiked: false,
+          };
+        })
+      );
+
+      // カバー画像を取得
+      let coverImage = "https://images.unsplash.com/photo-1587955793432-7c4ff80918ba?w=400";
+      if (photos.length > 0) {
+        coverImage = photos[0].url;
+      }
+
+      setAlbum({
+        id: albumData.id,
+        title: albumData.title,
+        description: albumData.description || "アルバムの説明",
+        coverImage,
+        photos,
+        createdAt: albumData.created_at || albumData.updated_at,
+        category: "other",
+        isShared: false, // TODO: 共有情報を取得
+        contributors: [
+          {
+            name: user?.email?.split("@")[0] || "ユーザー",
+          },
+        ],
+      });
+
+      setLoading(false);
+    };
+
+    fetchAlbumData();
+  }, [id, user]);
+
+  const handleBack = () => {
+    router.push("/albums");
+  };
+
+  const handleShare = async () => {
+    if (!id) return;
+    
+    // 共有トークンを生成
+    const token = crypto.randomUUID().replace(/-/g, "");
+    const { error } = await supabase
+      .from("shares")
+      .insert({ album_id: id, token, permission: "viewer" });
+
+    if (!error) {
+      const shareUrl = `${window.location.origin}/share/${token}`;
+      await navigator.clipboard.writeText(shareUrl);
+      alert(`共有リンクをコピーしました！\n${shareUrl}`);
+    } else {
+      console.error("共有リンク作成エラー:", error);
+      alert("共有リンクの作成に失敗しました");
+    }
+  };
+
+  const handleDownload = () => {
+    alert("アルバムのダウンロードを開始します...");
+    // TODO: ダウンロード機能の実装
+  };
+
+  const handleLikePhoto = (photoId: string) => {
+    console.log("いいね:", photoId);
+    // TODO: いいね機能の実装
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push("/login");
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
       </div>
-    </main>
-  );
-}
-
-async function uploadImage(albumId: string, formData: FormData) {
-  "use server";
-  const supabase = createSupabaseServer();
-  const file = formData.get("file") as File | null;
-  if (!file) return;
-
-  const key = `albums/${albumId}/photos/${crypto.randomUUID()}-${file.name}`;
-  const { error: upErr } = await supabase.storage.from("photos").upload(key, file, { upsert: false });
-  if (!upErr) {
-    await supabase.from("photos").insert({ album_id: albumId, storage_key: key, mime_type: file.type, bytes: file.size });
+    );
   }
-}
 
-async function createShare(albumId: string) {
-  "use server";
-  const supabase = createSupabaseServer();
-  const token = crypto.randomUUID().replace(/-/g, "");
-  await supabase.from("shares").insert({ album_id: albumId, token, permission: "viewer" });
-}
+  if (!album) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold mb-2">アルバムが見つかりません</h2>
+          <button onClick={handleBack} className="text-blue-600 hover:underline">
+            アルバム一覧に戻る
+          </button>
+        </div>
+      </div>
+    );
+  }
 
-async function getSignedUrl(path: string) {
-  const supabase = createSupabaseServer();
-  const { data } = await supabase.storage.from("photos").createSignedUrl(path, 60 * 10);
-  return data?.signedUrl ?? "";
-}
-
-async function Photo({ storageKey }: { storageKey: string }) {
-  const url = await getSignedUrl(storageKey);
   return (
-    <div className="relative aspect-square overflow-hidden rounded border">
-      {/* Next/Imageは外部ドメイン許可が必要。とりあえずimgでOK */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={url} alt="" className="h-full w-full object-cover" />
+    <div className="min-h-screen bg-background">
+      {user && (
+        <Header
+          user={{
+            name: user.email?.split("@")[0] || "ユーザー",
+            email: user.email || "",
+          }}
+          onLogout={handleLogout}
+        />
+      )}
+      <AlbumViewer
+        album={album}
+        onBack={handleBack}
+        onShare={handleShare}
+        onDownload={handleDownload}
+        onLikePhoto={handleLikePhoto}
+      />
     </div>
   );
 }
