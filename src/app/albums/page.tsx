@@ -31,10 +31,41 @@ export default function AlbumsPage() {
   const router = useRouter();
   const [albums, setAlbums] = useState<DashboardAlbum[]>([]);
   const [loading, setLoading] = useState(true);
+  const [profileChecked, setProfileChecked] = useState(false);
+
+  // 新規ユーザーのプロフィールチェック
+  useEffect(() => {
+    const checkProfile = async () => {
+      if (!user) return;
+      
+      console.log("AlbumsPage: プロフィールチェック開始");
+      
+      const { data: profile, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("user_id", user.id)
+        .single();
+
+      console.log("AlbumsPage: プロフィール確認結果", { profile, error });
+
+      // プロフィールが存在しないか、display_nameが設定されていない場合
+      if (!profile || !profile.display_name) {
+        console.log("AlbumsPage: 新規ユーザー検出 - プロフィール設定へリダイレクト");
+        router.push("/account/setup");
+        return;
+      }
+
+      setProfileChecked(true);
+    };
+
+    if (user) {
+      checkProfile();
+    }
+  }, [user, router]);
 
   useEffect(() => {
     const fetchAlbums = async () => {
-      if (!user) return;
+      if (!user || !profileChecked) return;
       
       console.log("AlbumsPage: ユーザー情報", user);
       
@@ -90,7 +121,7 @@ export default function AlbumsPage() {
     };
 
     fetchAlbums();
-  }, [user]);
+  }, [user, profileChecked]);
 
   const handleCreateAlbum = async () => {
     if (!user) return;
