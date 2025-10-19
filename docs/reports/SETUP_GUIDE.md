@@ -1,0 +1,209 @@
+# セットアップガイド
+
+## 環境要件
+
+- **Node.js**: v18.18.0 以上（推奨: v20以上）
+- **npm**: v8以上
+- **Supabase**: リモートプロジェクトまたはローカルインスタンス
+
+## 初回セットアップ
+
+### 1. 依存関係のインストール
+
+```bash
+npm install
+```
+
+### 2. 環境変数の設定
+
+`.env.local.example`をコピーして`.env.local`を作成します：
+
+```bash
+cp .env.local.example .env.local
+```
+
+#### オプションA: リモートSupabaseを使用（推奨）
+
+1. [Supabase](https://supabase.com)にアクセスしてプロジェクトを作成
+2. プロジェクトダッシュボード > **Settings** > **API**を開く
+3. 以下の値を`.env.local`に設定：
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
+```
+
+**APIキーの取得方法：**
+- **Project URL**: `https://your-project.supabase.co`
+- **anon public key**: `API Settings`ページの`anon`キーをコピー
+
+#### オプションB: ローカルSupabaseを使用
+
+⚠️ **注意**: Node.js 18以上が必要です
+
+1. Supabase CLIをインストール（オプション）:
+   ```bash
+   npm install -g supabase
+   ```
+
+2. ローカルSupabaseを起動:
+   ```bash
+   npx supabase start
+   ```
+
+3. 表示される情報を`.env.local`に設定:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=表示されたanon-key
+   ```
+
+### 3. データベーススキーマの設定
+
+#### リモートSupabaseの場合（推奨）
+
+1. Supabaseダッシュボード > **SQL Editor**を開く
+2. **New Query**をクリック
+3. `supabase/sql/complete-setup.sql`の内容を**全て**コピー&ペースト
+4. **Run**ボタンをクリックして実行
+5. "Success. No rows returned" と表示されれば成功
+
+**詳細な手順**: `docs/reports/DATABASE_SETUP.md` を参照
+
+#### テーブル作成の確認
+
+Supabaseダッシュボード > **Table Editor**で以下のテーブルが作成されていることを確認：
+- ✅ profiles
+- ✅ albums
+- ✅ photos
+- ✅ shares
+- ✅ album_members
+- ✅ comments
+- ✅ photo_tags
+
+#### ローカルSupabaseの場合
+
+マイグレーションは自動的に適用されます。
+
+### 4. 開発サーバーの起動
+
+```bash
+npm run dev
+```
+
+ブラウザで [http://localhost:3000](http://localhost:3000) にアクセス
+
+## トラブルシューティング
+
+### Node.jsバージョンエラー
+
+```
+You are using Node.js 16.15.1. For Next.js, Node.js version "^18.18.0 || ^19.8.0 || >= 20.0.0" is required.
+```
+
+**解決方法**: Node.jsをアップグレードしてください
+
+- [nvm](https://github.com/nvm-sh/nvm)を使用（推奨）:
+  ```bash
+  nvm install 20
+  nvm use 20
+  ```
+
+- または[公式サイト](https://nodejs.org/)からインストール
+
+### Supabase接続エラー
+
+```
+ERR_NAME_NOT_RESOLVED
+```
+
+**解決方法**:
+1. `.env.local`ファイルが存在することを確認
+2. `NEXT_PUBLIC_SUPABASE_URL`と`NEXT_PUBLIC_SUPABASE_ANON_KEY`が正しく設定されているか確認
+3. 開発サーバーを再起動: `npm run dev`
+
+### Magic Link送信エラー
+
+**確認事項**:
+1. Supabaseプロジェクトの認証設定
+   - ダッシュボード > **Authentication** > **Providers**
+   - Emailプロバイダーが有効になっているか確認
+2. リダイレクトURL設定
+   - ダッシュボード > **Authentication** > **URL Configuration**
+   - `http://localhost:3000/albums`を許可リストに追加
+
+## プロジェクト構成
+
+```
+mentra_photo_album/
+├── src/
+│   ├── app/                    # Next.js App Router
+│   │   ├── (auth)/
+│   │   │   └── login/         # ログインページ
+│   │   ├── albums/            # アルバム一覧・詳細
+│   │   ├── share/             # 共有アルバム
+│   │   └── demo/              # デモページ
+│   ├── components/            # Reactコンポーネント
+│   │   ├── ui/                # shadcn/ui コンポーネント
+│   │   └── figma/             # Figma生成コンポーネント
+│   ├── lib/                   # ユーティリティ
+│   └── types/                 # TypeScript型定義
+├── supabase/
+│   ├── config.toml            # Supabase設定
+│   ├── sql/                   # SQLスクリプト
+│   └── functions/             # Edge Functions
+├── .env.local                 # 環境変数（gitignore）
+└── .env.local.example         # 環境変数テンプレート
+```
+
+## 主要な機能
+
+### 実装済み
+- ✅ Magic Linkログイン
+- ✅ アルバム一覧・作成
+- ✅ アルバム詳細表示
+- ✅ 写真アップロード（既存機能）
+- ✅ 共有リンク生成
+
+### 開発中
+- 🚧 画像アップロードUI（Figmaデザイン統合）
+- 🚧 いいね機能
+- 🚧 プロフィール設定
+- 🚧 ダウンロード機能
+
+## 開発Tips
+
+### ローカルSupabaseの管理
+
+```bash
+# 起動
+npx supabase start
+
+# 停止
+npx supabase stop
+
+# ステータス確認
+npx supabase status
+
+# Studio（管理画面）を開く
+# http://localhost:54323
+```
+
+### データベースのリセット
+
+```bash
+npx supabase db reset
+```
+
+### Edge Functionのデプロイ
+
+```bash
+npx supabase functions deploy share
+```
+
+## 参考リンク
+
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Supabase Documentation](https://supabase.com/docs)
+- [shadcn/ui](https://ui.shadcn.com/)
+- [Tailwind CSS](https://tailwindcss.com/)
+
