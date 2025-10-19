@@ -67,7 +67,7 @@ export function MagicLinkSent({
                 <h4 className="font-medium text-blue-900 mb-2">次の手順：</h4>
                 <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
                   <li>メールボックスを確認してください</li>
-                  <li>「PhotoAlbumにログイン」という件名のメールを探してください</li>
+                  <li>「Mentra Photo Albumにログイン」という件名のメールを探してください</li>
                   <li>メール内のログインボタンをクリックしてください</li>
                 </ol>
               </div>

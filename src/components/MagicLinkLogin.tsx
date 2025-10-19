@@ -35,7 +35,7 @@ export function MagicLinkLogin({ onSendMagicLink, isLoading = false }: MagicLink
                 <Sparkles className="h-4 w-4 text-yellow-500 absolute -top-1 -right-1" />
               </div>
               <div>
-                <h1 className="text-3xl font-medium text-gray-900">PhotoAlbum</h1>
+                <h1 className="text-3xl font-medium text-gray-900">Mentra Photo Album</h1>
                 <p className="text-blue-600">みんなの思い出を共有しよう</p>
               </div>
             </div>

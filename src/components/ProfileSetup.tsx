@@ -70,7 +70,7 @@ export function ProfileSetup({ email, onComplete, onSkip }: ProfileSetupProps) {
             </div>
             <CardTitle className="text-2xl">プロフィールを設定</CardTitle>
             <CardDescription className="text-base">
-              PhotoAlbumへようこそ！<br />
+              Mentra Photo Albumへようこそ！<br />
               簡単なプロフィール情報を設定して始めましょう
             </CardDescription>
           </CardHeader>

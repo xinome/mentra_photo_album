@@ -84,7 +84,7 @@ export function LoginForm({ onLogin, onSignup }: LoginFormProps) {
           <CardHeader className="text-center">
             <div className="flex items-center justify-center space-x-2 mb-4">
               <Camera className="h-8 w-8 text-primary" />
-              <CardTitle className="text-2xl">PhotoAlbum</CardTitle>
+              <CardTitle className="text-2xl">Mentra Photo Album</CardTitle>
             </div>
             <CardDescription>
               アカウントにログインして写真アルバムを作成しましょう

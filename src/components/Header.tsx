@@ -27,7 +27,7 @@ export function Header({ user, onLogout }: HeaderProps) {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-2">
             <Camera className="h-8 w-8 text-primary" />
-            <h1 className="text-xl font-medium text-primary">PhotoAlbum</h1>
+            <h1 className="text-xl font-medium text-primary">Mentra Photo Album</h1>
           </div>
 
           {user ? (
