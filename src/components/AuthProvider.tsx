@@ -4,6 +4,9 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 
+// ダミー環境のチェック用
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://dummy.supabase.co";
+
 interface AuthContextType {
   user: User | null;
   loading: boolean;
@@ -31,6 +34,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const getInitialSession = async () => {
       console.log("AuthProvider: 初期セッション取得開始");
       try {
+        // ダミー値の場合は認証をスキップ
+        if (supabaseUrl === "https://dummy.supabase.co") {
+          console.log("AuthProvider: ダミー環境のため認証をスキップ");
+          setUser(null);
+          setLoading(false);
+          return;
+        }
+        
         const { data: { session }, error } = await supabase.auth.getSession();
         console.log("AuthProvider: 初期セッション取得結果", { session, error });
         setUser(session?.user ?? null);
