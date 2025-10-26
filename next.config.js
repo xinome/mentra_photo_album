@@ -1,7 +1,6 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  // React 19とNext.js 15.5の互換性向上
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // React 18とNext.js 13の互換性向上
   reactStrictMode: true,
   // 画像最適化の設定
   images: {
@@ -16,4 +15,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
