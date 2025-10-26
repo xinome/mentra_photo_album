@@ -31,7 +31,7 @@ CREATE POLICY profiles_delete ON public.profiles
 FOR DELETE USING (user_id = auth.uid());
 
 -- ====================================
--- 2. albums テーブルのRLS
+-- 2. albums テーブルのRLS（循環参照を解消）
 -- ====================================
 ALTER TABLE public.albums ENABLE ROW LEVEL SECURITY;
 
@@ -40,7 +40,7 @@ DROP POLICY IF EXISTS albums_insert ON public.albums;
 DROP POLICY IF EXISTS albums_update ON public.albums;
 DROP POLICY IF EXISTS albums_delete ON public.albums;
 
--- 簡易版: オーナーまたは公開アルバムのみ（循環参照を解消）
+-- 簡易版: オーナーまたは公開アルバムのみ
 CREATE POLICY albums_select ON public.albums
 FOR SELECT USING (
   owner_id = auth.uid() OR 
@@ -57,7 +57,7 @@ CREATE POLICY albums_delete ON public.albums
 FOR DELETE USING (owner_id = auth.uid());
 
 -- ====================================
--- 3. album_members テーブルのRLS
+-- 3. album_members テーブルのRLS（循環参照を解消）
 -- ====================================
 ALTER TABLE public.album_members ENABLE ROW LEVEL SECURITY;
 
@@ -65,7 +65,7 @@ DROP POLICY IF EXISTS album_members_select ON public.album_members;
 DROP POLICY IF EXISTS album_members_insert ON public.album_members;
 DROP POLICY IF EXISTS album_members_delete ON public.album_members;
 
--- 簡易版: 自分が関係するメンバー情報のみ（循環参照を解消）
+-- 簡易版: 自分が関係するメンバー情報のみ
 CREATE POLICY album_members_select ON public.album_members
 FOR SELECT USING (user_id = auth.uid());
 
@@ -76,7 +76,7 @@ CREATE POLICY album_members_delete ON public.album_members
 FOR DELETE USING (user_id = auth.uid());
 
 -- ====================================
--- 4. photos テーブルのRLS
+-- 4. photos テーブルのRLS（簡素化）
 -- ====================================
 ALTER TABLE public.photos ENABLE ROW LEVEL SECURITY;
 
@@ -85,7 +85,7 @@ DROP POLICY IF EXISTS photos_insert ON public.photos;
 DROP POLICY IF EXISTS photos_update ON public.photos;
 DROP POLICY IF EXISTS photos_delete ON public.photos;
 
--- 簡易版: アルバムのオーナーまたは公開アルバムの写真（循環参照を解消）
+-- 簡易版: アルバムのオーナーまたは公開アルバムの写真
 CREATE POLICY photos_select ON public.photos
 FOR SELECT USING (
   album_id IN (

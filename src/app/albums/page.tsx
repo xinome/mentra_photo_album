@@ -12,6 +12,7 @@ interface DbAlbum {
   id: string;
   title: string;
   updated_at: string;
+  created_at: string;
   description?: string;
 }
 
@@ -71,8 +72,8 @@ export default function AlbumsPage() {
       
       const { data: albumsData, error } = await supabase
         .from("albums")
-        .select("id,title,updated_at,description")
-        .order("updated_at", { ascending: false });
+        .select("id,title,updated_at,description,created_at")
+        .order("created_at", { ascending: false });
 
       console.log("AlbumsPage: アルバム取得結果", { albumsData, error });
       
@@ -94,11 +95,16 @@ export default function AlbumsPage() {
 
             let coverImage = "https://images.unsplash.com/photo-1587955793432-7c4ff80918ba?w=400";
             if (photos && photos.length > 0) {
-              const { data: signedUrl } = await supabase.storage
-                .from("photos")
-                .createSignedUrl(photos[0].storage_key, 3600);
-              if (signedUrl) {
-                coverImage = signedUrl.signedUrl;
+              // storage_keyがURLの場合は直接使用、それ以外はStorageから取得
+              if (photos[0].storage_key.startsWith('http')) {
+                coverImage = photos[0].storage_key;
+              } else {
+                const { data: signedUrl } = await supabase.storage
+                  .from("photos")
+                  .createSignedUrl(photos[0].storage_key, 3600);
+                if (signedUrl) {
+                  coverImage = signedUrl.signedUrl;
+                }
               }
             }
 
@@ -108,7 +114,7 @@ export default function AlbumsPage() {
               description: album.description || "アルバムの説明",
               coverImage,
               photoCount: count || 0,
-              createdAt: album.updated_at,
+              createdAt: album.created_at || album.updated_at,
               category: "other" as const,
               isShared: false, // TODO: 共有情報を取得
             };
@@ -143,7 +149,7 @@ export default function AlbumsPage() {
         description: data[0].description || "アルバムの説明",
         coverImage: "https://images.unsplash.com/photo-1587955793432-7c4ff80918ba?w=400",
         photoCount: 0,
-        createdAt: data[0].updated_at,
+        createdAt: data[0].created_at || data[0].updated_at,
         category: "other",
         isShared: false,
       };

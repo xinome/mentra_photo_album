@@ -81,14 +81,22 @@ export default function AlbumDetailPage() {
       // 各写真のURLを取得
       const photos: Photo[] = await Promise.all(
         (photosData || []).map(async (photo: DbPhoto) => {
-          const { data: signedUrl } = await supabase.storage
-            .from("photos")
-            .createSignedUrl(photo.storage_key, 3600);
+          let photoUrl = "";
+          
+          // storage_keyがURLの場合は直接使用、それ以外はStorageから取得
+          if (photo.storage_key.startsWith('http')) {
+            photoUrl = photo.storage_key;
+          } else {
+            const { data: signedUrl } = await supabase.storage
+              .from("photos")
+              .createSignedUrl(photo.storage_key, 3600);
+            photoUrl = signedUrl?.signedUrl || "";
+          }
 
           return {
             id: photo.id,
-            url: signedUrl?.signedUrl || "",
-            thumbnail: signedUrl?.signedUrl || "",
+            url: photoUrl,
+            thumbnail: photoUrl,
             title: photo.caption || undefined,
             uploadedBy: {
               name: user?.email?.split("@")[0] || "ユーザー",
