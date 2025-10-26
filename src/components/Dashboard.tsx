@@ -43,19 +43,27 @@ export function Dashboard({ albums, onCreateAlbum, onOpenAlbum }: DashboardProps
   const recentAlbums = albums.slice(0, 6);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
       {/* Hero Section */}
-      <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="bg-white border-b shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center">
-            <h1 className="text-3xl font-medium text-gray-900 mb-4">
+            <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium mb-6">
+              <Camera className="h-4 w-4" />
+              あなたのアルバム
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
               写真アルバムへようこそ
             </h1>
-            <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-              大切な思い出を整理して、みんなで共有しましょう。
+            <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
+              大切な思い出を整理して、みんなで共有しましょう。<br />
               結婚式、イベント、部活動など、あらゆる場面の写真を簡単にアルバム化できます。
             </p>
-            <Button onClick={onCreateAlbum} size="lg" className="gap-2">
+            <Button 
+              onClick={onCreateAlbum} 
+              size="lg" 
+              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 gap-2"
+            >
               <Plus className="h-5 w-5" />
               新しいアルバムを作成
             </Button>
@@ -63,97 +71,111 @@ export function Dashboard({ albums, onCreateAlbum, onOpenAlbum }: DashboardProps
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card>
-            <CardContent className="p-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <CardContent className="p-8">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">総アルバム数</p>
-                  <p className="text-2xl font-semibold">{albums.length}</p>
+                  <p className="text-sm text-muted-foreground font-medium">総アルバム数</p>
+                  <p className="text-3xl font-bold text-gray-900">{albums.length}</p>
                 </div>
-                <Camera className="h-8 w-8 text-blue-600" />
+                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                  <Camera className="h-6 w-6 text-blue-600" />
+                </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="p-6">
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <CardContent className="p-8">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">総写真数</p>
-                  <p className="text-2xl font-semibold">
+                  <p className="text-sm text-muted-foreground font-medium">総写真数</p>
+                  <p className="text-3xl font-bold text-gray-900">
                     {albums.reduce((sum, album) => sum + album.photoCount, 0)}
                   </p>
                 </div>
-                <Heart className="h-8 w-8 text-red-600" />
+                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                  <Heart className="h-6 w-6 text-red-600" />
+                </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="p-6">
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <CardContent className="p-8">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">共有中</p>
-                  <p className="text-2xl font-semibold">
+                  <p className="text-sm text-muted-foreground font-medium">共有中</p>
+                  <p className="text-3xl font-bold text-gray-900">
                     {albums.filter(album => album.isShared).length}
                   </p>
                 </div>
-                <Users className="h-8 w-8 text-green-600" />
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                  <Users className="h-6 w-6 text-green-600" />
+                </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
         {/* Recent Albums */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-medium">最近のアルバム</h2>
+        <div className="mb-12">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-3xl font-bold text-gray-900">最近のアルバム</h2>
             {albums.length > 6 && (
-              <Button variant="outline">すべて表示</Button>
+              <Button variant="outline" className="rounded-xl">
+                すべて表示
+              </Button>
             )}
           </div>
 
           {albums.length === 0 ? (
-            <Card className="text-center py-12">
+            <Card className="border-0 shadow-lg text-center py-16">
               <CardContent>
-                <Camera className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Camera className="h-10 w-10 text-gray-400" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">
                   まだアルバムがありません
                 </h3>
-                <p className="text-gray-600 mb-6">
+                <p className="text-gray-600 mb-8 text-lg max-w-md mx-auto">
                   最初のアルバムを作成して、写真の整理を始めましょう。
                 </p>
-                <Button onClick={onCreateAlbum} className="gap-2">
-                  <Plus className="h-4 w-4" />
+                <Button 
+                  onClick={onCreateAlbum} 
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 gap-2"
+                >
+                  <Plus className="h-5 w-5" />
                   アルバムを作成
                 </Button>
               </CardContent>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {recentAlbums.map((album) => (
                 <Card
                   key={album.id}
-                  className="group cursor-pointer hover:shadow-lg transition-shadow"
+                  className="group cursor-pointer border-0 shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden"
                   onClick={() => onOpenAlbum(album.id)}
                 >
-                  <div className="aspect-video relative overflow-hidden rounded-t-lg">
+                  <div className="aspect-video relative overflow-hidden">
                     <ImageWithFallback
                       src={album.coverImage}
                       alt={album.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
-                    <div className="absolute top-2 right-2">
-                      <Badge className={categoryColors[album.category]}>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute top-4 right-4">
+                      <Badge className={`${categoryColors[album.category]} shadow-lg`}>
                         {categoryLabels[album.category]}
                       </Badge>
                     </div>
                     {album.isShared && (
-                      <div className="absolute top-2 left-2">
-                        <Badge variant="secondary" className="bg-white/90 text-gray-700">
+                      <div className="absolute top-4 left-4">
+                        <Badge variant="secondary" className="bg-white/90 text-gray-700 shadow-lg">
                           <Users className="h-3 w-3 mr-1" />
                           共有中
                         </Badge>
@@ -161,21 +183,23 @@ export function Dashboard({ albums, onCreateAlbum, onOpenAlbum }: DashboardProps
                     )}
                   </div>
                   
-                  <CardContent className="p-4">
-                    <CardTitle className="text-lg mb-2 line-clamp-1">
+                  <CardContent className="p-6">
+                    <CardTitle className="text-xl mb-3 line-clamp-1 font-bold">
                       {album.title}
                     </CardTitle>
-                    <CardDescription className="line-clamp-2 mb-3">
+                    <CardDescription className="line-clamp-2 mb-4 text-gray-600">
                       {album.description}
                     </CardDescription>
                     <div className="flex items-center justify-between text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-2">
                         <Camera className="h-4 w-4" />
-                        {album.photoCount}枚
+                        <span className="font-medium">{album.photoCount}枚</span>
                       </div>
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-2">
                         <Calendar className="h-4 w-4" />
-                        {new Date(album.createdAt).toLocaleDateString('ja-JP')}
+                        <span className="font-medium">
+                          {new Date(album.createdAt).toLocaleDateString('ja-JP')}
+                        </span>
                       </div>
                     </div>
                   </CardContent>
@@ -186,33 +210,43 @@ export function Dashboard({ albums, onCreateAlbum, onOpenAlbum }: DashboardProps
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card className="p-6">
-            <CardHeader className="p-0 pb-4">
-              <CardTitle className="flex items-center gap-2">
-                <Plus className="h-5 w-5 text-blue-600" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300 p-8">
+            <CardHeader className="p-0 pb-6">
+              <CardTitle className="flex items-center gap-3 text-xl">
+                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                  <Plus className="h-5 w-5 text-blue-600" />
+                </div>
                 新しいアルバム
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-gray-600 text-base">
                 写真をアップロードして新しいアルバムを作成します
               </CardDescription>
             </CardHeader>
-            <Button onClick={onCreateAlbum} className="w-full">
+            <Button 
+              onClick={onCreateAlbum} 
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+            >
               アルバムを作成
             </Button>
           </Card>
 
-          <Card className="p-6">
-            <CardHeader className="p-0 pb-4">
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-green-600" />
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300 p-8">
+            <CardHeader className="p-0 pb-6">
+              <CardTitle className="flex items-center gap-3 text-xl">
+                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                  <Users className="h-5 w-5 text-green-600" />
+                </div>
                 共有を管理
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-gray-600 text-base">
                 アルバムの共有設定を変更します
               </CardDescription>
             </CardHeader>
-            <Button variant="outline" className="w-full">
+            <Button 
+              variant="outline" 
+              className="w-full border-2 border-gray-300 hover:border-gray-400 py-3 rounded-xl"
+            >
               共有設定
             </Button>
           </Card>

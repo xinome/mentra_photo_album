@@ -1,13 +1,15 @@
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+// 開発環境用のダミー値
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://dummy.supabase.co";
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "dummy-key";
 
-if (!supabaseUrl) {
-  throw new Error('Missing env.NEXT_PUBLIC_SUPABASE_URL');
+// 環境変数が設定されていない場合は警告を表示
+if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+  console.warn('NEXT_PUBLIC_SUPABASE_URL is not set. Using dummy value.');
 }
-if (!supabaseAnonKey) {
-  throw new Error('Missing env.NEXT_PUBLIC_SUPABASE_ANON_KEY');
+if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  console.warn('NEXT_PUBLIC_SUPABASE_ANON_KEY is not set. Using dummy value.');
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
