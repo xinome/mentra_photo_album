@@ -1,6 +1,7 @@
 "use client";
 import { supabase } from "@/lib/supabase";
-import { useState } from "react";
+import { getAuthRedirectUrl } from "@/lib/config";
+import React, { useState } from "react";
 import { MagicLinkLogin } from "@/components/MagicLinkLogin";
 import { MagicLinkSent } from "@/components/MagicLinkSent";
 
@@ -19,7 +20,7 @@ export default function LoginPage() {
     const { error } = await supabase.auth.signInWithOtp({ 
       email, 
       options: { 
-        emailRedirectTo: `${location.origin}/albums` 
+        emailRedirectTo: getAuthRedirectUrl()
       }
     });
     
@@ -34,7 +35,7 @@ export default function LoginPage() {
     await supabase.auth.signInWithOtp({ 
       email, 
       options: { 
-        emailRedirectTo: `${location.origin}/albums` 
+        emailRedirectTo: getAuthRedirectUrl()
       }
     });
     setLoading(false);

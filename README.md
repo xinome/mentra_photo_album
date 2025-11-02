@@ -58,6 +58,18 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
 1. [Supabase Dashboard](https://supabase.com/dashboard)でプロジェクトを開く
 2. Settings > API から`Project URL`と`anon public`キーをコピー
 
+**⚠️ 重要: Magic Link認証のリダイレクトURL設定**
+
+Vercelにデプロイする場合は、Supabaseダッシュボードで以下を設定してください：
+
+1. Supabase Dashboard > **Authentication** > **URL Configuration**を開く
+2. **Site URL** を設定: `https://mentra-photo-album.vercel.app`
+3. **Redirect URLs** に以下を追加:
+   - `https://mentra-photo-album.vercel.app/albums` (本番環境)
+   - `http://localhost:3000/albums` (ローカル開発)
+
+これにより、Magic Linkからの認証後に正しくリダイレクトされます。
+
 ### 4. データベースをセットアップ
 
 **重要**: この手順を実行しないとアプリケーションが正しく動作しません。

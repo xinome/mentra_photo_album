@@ -127,9 +127,12 @@ ERR_NAME_NOT_RESOLVED
 1. Supabaseプロジェクトの認証設定
    - ダッシュボード > **Authentication** > **Providers**
    - Emailプロバイダーが有効になっているか確認
-2. リダイレクトURL設定
+2. リダイレクトURL設定（重要！）
    - ダッシュボード > **Authentication** > **URL Configuration**
-   - `http://localhost:3000/albums`を許可リストに追加
+   - 以下のURLを許可リストに追加：
+     - ローカル開発: `http://localhost:3000/albums`
+     - 本番環境: `https://mentra-photo-album.vercel.app/albums`
+     - （その他使用するURLがある場合は追加）
 
 ## プロジェクト構成
 
