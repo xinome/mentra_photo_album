@@ -67,7 +67,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
 4. **Run**ボタンをクリックして実行
 5. "Success. No rows returned" と表示されれば成功
 
-**詳細な手順**: `docs/reports/DATABASE_SETUP.md` を参照
+**詳細な手順**: [データベースセットアップガイド](../database/DATABASE_SETUP.md) を参照
 
 #### テーブル作成の確認
 

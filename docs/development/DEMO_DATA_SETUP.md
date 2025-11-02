@@ -160,8 +160,8 @@ WHERE owner_id = auth.uid()
 ## 🔗 参考リンク
 
 - [サンプルデータSQL](../../supabase/sql/sample-data.sql)
-- [データベースセットアップガイド](./DATABASE_SETUP.md)
-- [セットアップガイド](./SETUP_GUIDE.md)
+- [データベースセットアップガイド](../database/DATABASE_SETUP.md)
+- [セットアップガイド](../setup/SETUP_GUIDE.md)
 - [Unsplash](https://unsplash.com)
 
 ## 📊 データ統計

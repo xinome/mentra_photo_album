@@ -18,7 +18,7 @@ SQLエラー「column "user_id" does not exist」が発生する問題に対し�
 2. `02-rls-policies.sql` → RLS設定
 3. Storage UIからバケット作成（手動）
 
-👉 [README.md](../../README.md#4-データベースをセットアップ) または [QUICK_FIX_GUIDE.md](QUICK_FIX_GUIDE.md)
+👉 [README.md](../../README.md#4-データベースをセットアップ) または [クイック修正ガイド](../development/QUICK_FIX_GUIDE.md)
 
 ---
 
@@ -61,11 +61,11 @@ SQLエラー「column "user_id" does not exist」が発生する問題に対し�
 
 | ファイル | 内容 | 対象読者 |
 |---------|------|---------|
-| `MANUAL_SETUP_GUIDE.md` | 手動セットアップ手順 | 確実に動作させたい人 |
-| `QUICK_FIX_GUIDE.md` | クイック修正ガイド | 段階的セットアップをしたい人 |
-| `DATABASE_SETUP.md` | データベース詳細ガイド | 詳しく知りたい人 |
-| `TABLE_STRUCTURE.md` | テーブル構造リファレンス | 開発者向け |
-| `SETUP_SUMMARY.md` | このファイル | 全員 |
+| [手動セットアップガイド](MANUAL_SETUP_GUIDE.md) | 手動セットアップ手順 | 確実に動作させたい人 |
+| [クイック修正ガイド](../development/QUICK_FIX_GUIDE.md) | クイック修正ガイド | 段階的セットアップをしたい人 |
+| [データベース詳細ガイド](../database/DATABASE_SETUP.md) | データベース詳細ガイド | 詳しく知りたい人 |
+| [テーブル構造リファレンス](../database/TABLE_STRUCTURE.md) | テーブル構造リファレンス | 開発者向け |
+| [セットアップガイド](SETUP_GUIDE.md) | セットアップガイド | 全員 |
 
 ---
 
@@ -97,7 +97,7 @@ SQLエラー「column "user_id" does not exist」が発生する問題に対し�
 **症状**: `column "user_id" does not exist`
 
 **対処法**:
-1. 段階的セットアップを試す（[QUICK_FIX_GUIDE.md](QUICK_FIX_GUIDE.md)）
+1. 段階的セットアップを試す（[クイック修正ガイド](../development/QUICK_FIX_GUIDE.md)）
 2. それでもダメなら手動セットアップ（[MANUAL_SETUP_GUIDE.md](MANUAL_SETUP_GUIDE.md)）
 
 ---

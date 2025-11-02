@@ -90,9 +90,9 @@ Vercelにデプロイする場合は、Supabaseダッシュボードで以下を
 
 #### 代替方法: 手動セットアップ
 
-SQLエラーが解決しない場合は [手動セットアップガイド](docs/reports/MANUAL_SETUP_GUIDE.md) を参照してください。
+SQLエラーが解決しない場合は [手動セットアップガイド](docs/setup/MANUAL_SETUP_GUIDE.md) を参照してください。
 
-詳細は [データベースセットアップガイド](docs/reports/DATABASE_SETUP.md) を参照してください。
+詳細は [データベースセットアップガイド](docs/database/DATABASE_SETUP.md) を参照してください。
 
 #### サンプルデータの投入（オプション）
 
@@ -118,10 +118,20 @@ npm run dev
 
 ## 📚 ドキュメント
 
-- [セットアップガイド](docs/reports/SETUP_GUIDE.md) - 詳細なセットアップ手順
-- [データベースセットアップ](docs/reports/DATABASE_SETUP.md) - データベース設定の詳細
-- [新規ユーザーフローテスト](docs/reports/NEW_USER_FLOW_TEST.md) - 新規ユーザー登録フローの検証方法
-- [本番移行の次のステップ](docs/reports/MIGRATION_NEXT_STEPS.md) - 今後の開発計画
+### セットアップ関連
+- [セットアップガイド](docs/setup/SETUP_GUIDE.md) - 詳細なセットアップ手順
+- [手動セットアップガイド](docs/setup/MANUAL_SETUP_GUIDE.md) - 確実な手動セットアップ
+- [セットアップ方法まとめ](docs/setup/SETUP_SUMMARY.md) - セットアップ方法の比較
+
+### データベース関連
+- [データベースセットアップ](docs/database/DATABASE_SETUP.md) - データベース設定の詳細
+- [テーブル構造](docs/database/TABLE_STRUCTURE.md) - データベーステーブル仕様
+
+### 開発関連
+- [新規ユーザーフローテスト](docs/development/NEW_USER_FLOW_TEST.md) - 新規ユーザー登録フローの検証方法
+- [本番移行の次のステップ](docs/development/MIGRATION_NEXT_STEPS.md) - 今後の開発計画
+- [デモデータセットアップ](docs/development/DEMO_DATA_SETUP.md) - デモ環境の構築
+- [クイック修正ガイド](docs/development/QUICK_FIX_GUIDE.md) - よくあるエラーの解決方法
 
 ## 🎨 デザイン
 
@@ -148,7 +158,9 @@ mentra_photo_album/
 │   ├── sql/                   # SQLスクリプト
 │   └── functions/             # Edge Functions
 └── docs/
-    └── reports/               # ドキュメント
+    ├── setup/                 # セットアップ関連ドキュメント
+    ├── database/              # データベース関連ドキュメント
+    └── development/           # 開発・検証関連ドキュメント
 ```
 
 ## 🔧 トラブルシューティング
@@ -157,7 +169,7 @@ mentra_photo_album/
 
 **エラー**: 「プロフィールの保存に失敗しました」
 
-**解決方法**: [データベースセットアップガイド](docs/reports/DATABASE_SETUP.md)を参照してデータベーステーブルを作成してください。
+**解決方法**: [データベースセットアップガイド](docs/database/DATABASE_SETUP.md)を参照してデータベーステーブルを作成してください。
 
 ### Node.jsバージョンエラー
 
@@ -180,7 +192,7 @@ nvm use 20
 2. 開発サーバーを再起動
 3. Supabaseダッシュボードでメール認証が有効になっているか確認
 
-詳細は[セットアップガイド](docs/reports/SETUP_GUIDE.md#トラブルシューティング)を参照してください。
+詳細は[セットアップガイド](docs/setup/SETUP_GUIDE.md#トラブルシューティング)を参照してください。
 
 ## 🛠️ 技術スタック
 
