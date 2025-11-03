@@ -65,11 +65,16 @@ type AppState =
   | "viewing"
   | "shared-viewing";
 
-export default function App() {
+type AppProps = {
+  initialState?: AppState;
+  initialUser?: User | null;
+};
+
+export default function App({ initialState, initialUser }: AppProps) {
   const [currentState, setCurrentState] =
-    useState<AppState>("login");
+    useState<AppState>(initialState ?? "login");
   const [currentUser, setCurrentUser] = useState<User | null>(
-    null,
+    initialUser ?? null,
   );
   const [selectedAlbumId, setSelectedAlbumId] = useState<
     string | null

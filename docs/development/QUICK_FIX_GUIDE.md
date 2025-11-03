@@ -56,7 +56,7 @@
 
 ### 代替: 手動セットアップ
 
-SQLでエラーが続く場合は、[手動セットアップガイド](MANUAL_SETUP_GUIDE.md)を参照してください。
+SQLでエラーが続く場合は、[手動セットアップガイド](../setup/MANUAL_SETUP_GUIDE.md)を参照してください。
 
 ### ステップ2: テーブル作成を確認
 
@@ -182,9 +182,9 @@ ORDER BY tablename;
 
 ## 📚 関連ドキュメント
 
-- [TABLE_STRUCTURE.md](TABLE_STRUCTURE.md) - テーブル構造の詳細
-- [DATABASE_SETUP.md](DATABASE_SETUP.md) - データベースセットアップ詳細
-- [SETUP_GUIDE.md](SETUP_GUIDE.md) - 全体のセットアップガイド
+- [テーブル構造リファレンス](../database/TABLE_STRUCTURE.md) - テーブル構造の詳細
+- [データベースセットアップ詳細](../database/DATABASE_SETUP.md) - データベースセットアップ詳細
+- [セットアップガイド](../setup/SETUP_GUIDE.md) - 全体のセットアップガイド
 
 ## ✨ 完了チェックリスト
 

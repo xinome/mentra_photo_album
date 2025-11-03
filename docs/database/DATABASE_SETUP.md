@@ -13,7 +13,7 @@ ERROR: 42703: column "user_id" does not exist
 
 **最新版の`complete-setup.sql`を使用してください**（ストレージポリシーの問題を修正済み）
 
-👉 詳細は [QUICK_FIX_GUIDE.md](QUICK_FIX_GUIDE.md) を参照
+👉 詳細は [クイック修正ガイド](../development/QUICK_FIX_GUIDE.md) を参照
 
 ## 解決方法
 
