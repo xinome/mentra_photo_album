@@ -28,10 +28,11 @@ export function getBaseUrl(): string {
 /**
  * Magic Link認証後のリダイレクト先URLを取得
  * 環境に応じて自動的に適切なURLを返す
+ * 認証コールバックページにリダイレクトし、プロフィールチェック後に適切なページへ遷移する
  */
 export function getAuthRedirectUrl(): string {
   const baseUrl = getBaseUrl();
-  return `${baseUrl}/albums`;
+  return `${baseUrl}/auth/callback`;
 }
 
 /**

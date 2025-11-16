@@ -7,6 +7,9 @@ import { supabase } from "@/lib/supabase";
 import { useEffect, useState } from "react";
 import { Dashboard } from "@/components/Dashboard";
 import { Header } from "@/components/Header";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { AlertCircle, X, Settings } from "lucide-react";
 
 interface DbAlbum {
   id: string;
@@ -33,8 +36,9 @@ export default function AlbumsPage() {
   const [albums, setAlbums] = useState<DashboardAlbum[]>([]);
   const [loading, setLoading] = useState(true);
   const [profileChecked, setProfileChecked] = useState(false);
+  const [showProfileBanner, setShowProfileBanner] = useState(false);
 
-  // 新規ユーザーのプロフィールチェック
+  // プロフィールチェック（任意 - 警告バナーの表示のみ）
   useEffect(() => {
     const checkProfile = async () => {
       if (!user) return;
@@ -50,19 +54,22 @@ export default function AlbumsPage() {
       console.log("AlbumsPage: プロフィール確認結果", { profile, error });
 
       // プロフィールが存在しないか、display_nameが設定されていない場合
+      // 強制リダイレクトはせず、警告バナーを表示
       if (!profile || !profile.display_name) {
-        console.log("AlbumsPage: 新規ユーザー検出 - プロフィール設定へリダイレクト");
-        router.push("/account/setup");
-        return;
+        console.log("AlbumsPage: プロフィール未設定 - 警告バナーを表示");
+        setShowProfileBanner(true);
+      } else {
+        setShowProfileBanner(false);
       }
 
+      // プロフィールの有無に関わらず、アルバム機能は使用可能
       setProfileChecked(true);
     };
 
     if (user) {
       checkProfile();
     }
-  }, [user, router]);
+  }, [user]);
 
   useEffect(() => {
     const fetchAlbums = async () => {
@@ -190,6 +197,46 @@ export default function AlbumsPage() {
             onLogout={handleLogout}
           />
         )}
+        
+        {/* プロフィール未設定警告バナー */}
+        {showProfileBanner && (
+          <div className="bg-background border-b">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+              <Alert className="bg-blue-50 border-blue-200">
+                <AlertCircle className="h-4 w-4 text-blue-600" />
+                <AlertTitle className="text-blue-900 font-medium">
+                  プロフィールを設定しましょう
+                </AlertTitle>
+                <AlertDescription className="text-blue-800 mt-2">
+                  <p className="mb-3">
+                    プロフィールを設定することで、より快適にアルバムを管理できます。
+                    名前やアバターを設定して、あなたらしいアルバムを作りましょう。
+                  </p>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      onClick={() => router.push("/account/setup")}
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      <Settings className="h-4 w-4 mr-2" />
+                      プロフィールを設定
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setShowProfileBanner(false)}
+                      className="text-blue-700 hover:text-blue-900 hover:bg-blue-100"
+                    >
+                      <X className="h-4 w-4 mr-2" />
+                      閉じる
+                    </Button>
+                  </div>
+                </AlertDescription>
+              </Alert>
+            </div>
+          </div>
+        )}
+
         <Dashboard
           albums={albums}
           onCreateAlbum={handleCreateAlbum}
