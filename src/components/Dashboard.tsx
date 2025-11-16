@@ -1,6 +1,7 @@
 "use client";
 
-import { Plus, Calendar, Users, Heart, Camera } from "lucide-react";
+import { useState } from "react";
+import { Plus, Calendar, Users, Heart, Camera, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
@@ -40,7 +41,10 @@ const categoryColors = {
 };
 
 export function Dashboard({ albums, onCreateAlbum, onOpenAlbum }: DashboardProps) {
-  const recentAlbums = albums.slice(0, 6);
+  const [showAll, setShowAll] = useState(false);
+  const DISPLAY_LIMIT = 6;
+  const displayedAlbums = showAll ? albums : albums.slice(0, DISPLAY_LIMIT);
+  const hasMore = albums.length > DISPLAY_LIMIT;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
@@ -155,7 +159,7 @@ export function Dashboard({ albums, onCreateAlbum, onOpenAlbum }: DashboardProps
             </Card>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {recentAlbums.map((album) => (
+              {displayedAlbums.map((album) => (
                 <Card
                   key={album.id}
                   className="group cursor-pointer border-0 shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden"
@@ -205,6 +209,29 @@ export function Dashboard({ albums, onCreateAlbum, onOpenAlbum }: DashboardProps
                   </CardContent>
                 </Card>
               ))}
+            </div>
+          )}
+
+          {/* もっと見る/閉じるボタン */}
+          {hasMore && (
+            <div className="flex justify-center mt-8">
+              <Button
+                onClick={() => setShowAll(!showAll)}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                {showAll ? (
+                  <>
+                    <ChevronUp className="h-4 w-4" />
+                    閉じる
+                  </>
+                ) : (
+                  <>
+                    すべてのアルバムを表示 ({albums.length}件)
+                    <ChevronDown className="h-4 w-4" />
+                  </>
+                )}
+              </Button>
             </div>
           )}
         </div>
