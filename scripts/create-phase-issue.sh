@@ -206,22 +206,53 @@ echo -e "${YELLOW}タイトル: $TITLE${NC}"
 echo -e "${YELLOW}ラベル: $LABELS${NC}"
 echo ""
 
-# GitHub CLIでIssue作成
-ISSUE_URL=$(gh issue create \
-    --title "$TITLE" \
-    --label "$LABELS" \
-    --body "$BODY" \
-    --output json | jq -r '.url')
+# ラベルが存在するか確認して、存在しない場合はスキップ
+VALID_LABELS=""
+IFS=',' read -ra LABEL_ARRAY <<< "$LABELS"
+for label in "${LABEL_ARRAY[@]}"; do
+    label=$(echo "$label" | xargs)  # トリム
+    if gh label view "$label" &> /dev/null; then
+        if [ -z "$VALID_LABELS" ]; then
+            VALID_LABELS="$label"
+        else
+            VALID_LABELS="$VALID_LABELS,$label"
+        fi
+    else
+        echo -e "${YELLOW}⚠️  ラベル '$label' が存在しないためスキップします${NC}"
+    fi
+done
 
-if [ $? -eq 0 ] && [ -n "$ISSUE_URL" ]; then
-    ISSUE_NUMBER=$(echo "$ISSUE_URL" | grep -o '[0-9]*$')
-    echo -e "${GREEN}✅ Issue作成完了！${NC}"
-    echo -e "${GREEN}Issue番号: #$ISSUE_NUMBER${NC}"
-    echo -e "${GREEN}URL: $ISSUE_URL${NC}"
-    echo ""
-    echo -e "${BLUE}コミットメッセージに含めるIssue番号:${NC}"
-    echo -e "${YELLOW}Closes #$ISSUE_NUMBER${NC}"
+# GitHub CLIでIssue作成
+# 出力例: "https://github.com/xinome/mentra_photo_album/issues/123"
+if [ -n "$VALID_LABELS" ]; then
+    ISSUE_URL=$(gh issue create \
+        --title "$TITLE" \
+        --label "$VALID_LABELS" \
+        --body "$BODY" 2>&1)
 else
-    error_exit "Issueの作成に失敗しました"
+    ISSUE_URL=$(gh issue create \
+        --title "$TITLE" \
+        --body "$BODY" 2>&1)
+fi
+
+EXIT_CODE=$?
+
+if [ $EXIT_CODE -eq 0 ] && [ -n "$ISSUE_URL" ]; then
+    # URLからIssue番号を抽出
+    # 例: https://github.com/xinome/mentra_photo_album/issues/123 → 123
+    ISSUE_NUMBER=$(echo "$ISSUE_URL" | grep -oE '[0-9]+$')
+    
+    if [ -n "$ISSUE_NUMBER" ]; then
+        echo -e "${GREEN}✅ Issue作成完了！${NC}"
+        echo -e "${GREEN}Issue番号: #$ISSUE_NUMBER${NC}"
+        echo -e "${GREEN}URL: $ISSUE_URL${NC}"
+        echo ""
+        echo -e "${BLUE}コミットメッセージに含めるIssue番号:${NC}"
+        echo -e "${YELLOW}Closes #$ISSUE_NUMBER${NC}"
+    else
+        error_exit "Issue番号の抽出に失敗しました\n出力: $ISSUE_URL"
+    fi
+else
+    error_exit "Issueの作成に失敗しました\n終了コード: $EXIT_CODE\n出力: $ISSUE_URL"
 fi
 
