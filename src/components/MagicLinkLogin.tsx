@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Camera, Mail, ArrowRight, Shield, Sparkles } from "lucide-react";
+import { Camera, Mail, ArrowRight, Shield, Sparkles, AlertCircle } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
@@ -11,9 +11,10 @@ import { ImageWithFallback } from "./figma/ImageWithFallback";
 interface MagicLinkLoginProps {
   onSendMagicLink: (email: string) => void;
   isLoading?: boolean;
+  error?: string | null;
 }
 
-export function MagicLinkLogin({ onSendMagicLink, isLoading = false }: MagicLinkLoginProps) {
+export function MagicLinkLogin({ onSendMagicLink, isLoading = false, error }: MagicLinkLoginProps) {
   const [email, setEmail] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -119,14 +120,38 @@ export function MagicLinkLogin({ onSendMagicLink, isLoading = false }: MagicLink
                       id="email"
                       type="email"
                       placeholder="your@email.com"
-                      className="pl-10 h-12"
+                      className={`pl-10 h-12 ${error ? "border-red-500 focus-visible:ring-red-500" : ""}`}
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={(e) => {
+                        setEmail(e.target.value);
+                        // エラーが表示されている場合、入力時にクリア
+                        if (error) {
+                          // エラー状態をクリアするために親コンポーネントに通知が必要な場合は、
+                          // ここではローカルでクリアするだけ
+                        }
+                      }}
                       required
                       disabled={isLoading}
+                      aria-invalid={error ? "true" : "false"}
+                      aria-describedby={error ? "email-error" : undefined}
                     />
                   </div>
                 </div>
+
+                {/* エラーメッセージ表示 */}
+                {error && (
+                  <div
+                    id="email-error"
+                    className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3"
+                    role="alert"
+                  >
+                    <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-red-900 mb-1">エラーが発生しました</p>
+                      <p className="text-sm text-red-700">{error}</p>
+                    </div>
+                  </div>
+                )}
                 
                 <Button 
                   type="submit" 

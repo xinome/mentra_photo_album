@@ -1,6 +1,6 @@
 "use client";
 
-import { Mail, ArrowLeft, RefreshCw, ExternalLink, LogIn } from "lucide-react";
+import { Mail, ArrowLeft, RefreshCw, ExternalLink, LogIn, AlertCircle } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
@@ -13,6 +13,7 @@ interface MagicLinkSentProps {
   canResend?: boolean;
   resendCountdown?: number;
   onMockLogin?: (isNewUser: boolean) => void;
+  error?: string | null;
 }
 
 export function MagicLinkSent({ 
@@ -22,7 +23,8 @@ export function MagicLinkSent({
   isResending = false,
   canResend = true, 
   resendCountdown = 0,
-  onMockLogin
+  onMockLogin,
+  error
 }: MagicLinkSentProps) {
   const emailProvider = email.split('@')[1];
   
@@ -94,6 +96,20 @@ export function MagicLinkSent({
                 </ul>
               </div>
             </div>
+
+            {/* エラーメッセージ表示 */}
+            {error && (
+              <div
+                className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3"
+                role="alert"
+              >
+                <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-red-900 mb-1">再送信エラー</p>
+                  <p className="text-sm text-red-700">{error}</p>
+                </div>
+              </div>
+            )}
 
             {/* Actions */}
             <div className="space-y-3">
