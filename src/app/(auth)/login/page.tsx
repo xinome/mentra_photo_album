@@ -1,6 +1,7 @@
 "use client";
 import { supabase } from "@/lib/supabase";
 import { getAuthRedirectUrl } from "@/lib/config";
+import { getAuthErrorMessage } from "@/lib/auth-errors";
 import React, { useState } from "react";
 import { MagicLinkLogin } from "@/components/MagicLinkLogin";
 import { MagicLinkSent } from "@/components/MagicLinkSent";
@@ -12,38 +13,69 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [resendError, setResendError] = useState<string | null>(null);
 
   const handleSendMagicLink = async (email: string) => {
     setLoading(true);
+    setError(null);
     setEmail(email);
     
-    const { error } = await supabase.auth.signInWithOtp({ 
-      email, 
-      options: { 
-        emailRedirectTo: getAuthRedirectUrl()
+    try {
+      const { error: authError } = await supabase.auth.signInWithOtp({ 
+        email, 
+        options: { 
+          emailRedirectTo: getAuthRedirectUrl()
+        }
+      });
+      
+      if (authError) {
+        console.error("Magic Link送信エラー:", authError);
+        setError(getAuthErrorMessage(authError));
+        setLoading(false);
+        return;
       }
-    });
-    
-    if (!error) {
+      
+      // 成功時
       setSent(true);
+      setError(null);
+    } catch (err) {
+      console.error("予期しないエラー:", err);
+      setError("予期しないエラーが発生しました。もう一度お試しください。");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleResend = async () => {
     setLoading(true);
-    await supabase.auth.signInWithOtp({ 
-      email, 
-      options: { 
-        emailRedirectTo: getAuthRedirectUrl()
+    setResendError(null);
+    
+    try {
+      const { error: authError } = await supabase.auth.signInWithOtp({ 
+        email, 
+        options: { 
+          emailRedirectTo: getAuthRedirectUrl()
+        }
+      });
+      
+      if (authError) {
+        console.error("Magic Link再送信エラー:", authError);
+        setResendError(getAuthErrorMessage(authError));
       }
-    });
-    setLoading(false);
+    } catch (err) {
+      console.error("予期しないエラー:", err);
+      setResendError("予期しないエラーが発生しました。もう一度お試しください。");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleBack = () => {
     setSent(false);
     setEmail("");
+    setError(null);
+    setResendError(null);
   };
 
   if (sent) {
@@ -52,6 +84,8 @@ export default function LoginPage() {
         email={email}
         onBack={handleBack}
         onResend={handleResend}
+        isResending={loading}
+        error={resendError}
       />
     );
   }
@@ -60,6 +94,7 @@ export default function LoginPage() {
     <MagicLinkLogin
       onSendMagicLink={handleSendMagicLink}
       isLoading={loading}
+      error={error}
     />
   );
 }

@@ -28,10 +28,35 @@ export function getBaseUrl(): string {
 /**
  * Magic Link認証後のリダイレクト先URLを取得
  * 環境に応じて自動的に適切なURLを返す
+ * 認証コールバックページにリダイレクトし、プロフィールチェック後に適切なページへ遷移する
+ * 
+ * 注意: ブラウザ環境では必ず現在のURLベースを使用します
+ * localhost開発環境でも正しく動作するように、動的にURLを生成します
  */
 export function getAuthRedirectUrl(): string {
+  // ブラウザ環境の場合は必ず現在のURLを使用（localhost対応）
+  if (typeof window !== 'undefined') {
+    // 現在のURLから origin を取得（プロトコル、ホスト、ポートを含む）
+    const baseUrl = window.location.origin;
+    const redirectUrl = `${baseUrl}/auth/callback`;
+    
+    // デバッグログ（本番環境では削除推奨）
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Auth] Magic LinkリダイレクトURL:', redirectUrl);
+      console.log('[Auth] 現在のURL:', window.location.href);
+    }
+    
+    return redirectUrl;
+  }
+
+  // サーバー環境の場合（通常は使用されないが、念のため）
+  // 開発環境ではlocalhostを使用
+  if (process.env.NODE_ENV === 'development') {
+    return 'http://localhost:3000/auth/callback';
+  }
+  
   const baseUrl = getBaseUrl();
-  return `${baseUrl}/albums`;
+  return `${baseUrl}/auth/callback`;
 }
 
 /**
