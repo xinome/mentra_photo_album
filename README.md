@@ -204,6 +204,8 @@ nvm use 20
 
 ## 📝 開発状況
 
+詳細は [実装状況ドキュメント](docs/IMPLEMENTATION_STATUS.md) を参照してください。
+
 ### ✅ 実装済み
 
 - Magic Link認証
@@ -212,7 +214,13 @@ nvm use 20
 - アルバム一覧・作成
 - アルバム詳細表示
 - 写真アップロード（基本機能）
-- 共有リンク生成
+- エラーハンドリング
+- 重複アルバム削除
+
+### 🔄 開発ガイド
+
+- [開発ガイド](docs/DEVELOPMENT_GUIDE.md) - Figma Make、Cursor、Supabase連携ガイド
+- [実装状況](docs/IMPLEMENTATION_STATUS.md) - 実装済み機能と未実装機能の一覧
 - レスポンシブデザイン
 
 ### 🚧 開発中

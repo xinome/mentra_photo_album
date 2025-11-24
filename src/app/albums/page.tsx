@@ -6,6 +6,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { supabase } from "@/lib/supabase";
 import { useEffect, useState } from "react";
 import { Dashboard } from "@/components/Dashboard";
+import { AlbumCreator } from "@/components/AlbumCreator";
 import { Header } from "@/components/Header";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,17 @@ interface DashboardAlbum {
   isShared: boolean;
 }
 
+// AlbumCreatorから渡されるデータ型
+interface AlbumData {
+  title: string;
+  description: string;
+  category: string;
+  isPublic: boolean;
+  photos: File[];
+}
+
+type AlbumPageState = "dashboard" | "creating" | "viewing";
+
 export default function AlbumsPage() {
   const { user } = useAuth();
   const router = useRouter();
@@ -38,6 +50,8 @@ export default function AlbumsPage() {
   const [loading, setLoading] = useState(true);
   const [profileChecked, setProfileChecked] = useState(false);
   const [showProfileBanner, setShowProfileBanner] = useState(false);
+  const [currentState, setCurrentState] = useState<AlbumPageState>("dashboard");
+  const [selectedAlbumId, setSelectedAlbumId] = useState<string | null>(null);
   
   // デバッグ用: albumsの状態変更を監視
   useEffect(() => {
@@ -80,7 +94,7 @@ export default function AlbumsPage() {
     }
   }, [user]);
 
-  useEffect(() => {
+  // アルバム一覧を再取得する関数（外部定義）
     const fetchAlbums = async () => {
       if (!user || !profileChecked) return;
       
@@ -338,39 +352,160 @@ export default function AlbumsPage() {
       setLoading(false);
     };
 
+  useEffect(() => {
     fetchAlbums();
   }, [user, profileChecked]);
 
-  const handleCreateAlbum = async () => {
+  // アルバム作成画面に遷移（データ変更なし）
+  const handleCreateAlbum = () => {
+    setCurrentState("creating");
+  };
+
+  // アルバム作成画面から戻る
+  const handleBackToDashboard = () => {
+    setCurrentState("dashboard");
+    setSelectedAlbumId(null);
+  };
+
+  // アルバムを保存（Supabase統合）
+  const handleSaveAlbum = async (albumData: AlbumData) => {
     if (!user) return;
     
-    const { data, error } = await supabase
+    try {
+      console.log("AlbumsPage: アルバム保存開始", albumData);
+
+      // 1. 写真をSupabase Storageにアップロード
+      const uploadedPhotos: Array<{ storageKey: string; publicUrl: string }> = [];
+      const baseTimestamp = Date.now();
+      
+      for (let i = 0; i < albumData.photos.length; i++) {
+        const file = albumData.photos[i];
+        // ファイル名を安全な形式に変換（日本語や特殊文字を除去）
+        // 元のファイル名から拡張子を取得
+        const originalName = file.name;
+        const fileExtension = originalName.substring(originalName.lastIndexOf('.'));
+        // ファイル名を安全な形式に変換（英数字、ハイフン、アンダースコアのみ許可）
+        const sanitizedName = originalName
+          .replace(/\.[^/.]+$/, '') // 拡張子を一時的に除去
+          .replace(/[^a-zA-Z0-9_-]/g, '_') // 英数字以外をアンダースコアに置換
+          .substring(0, 50) // 長さを制限
+          + fileExtension; // 拡張子を追加
+        
+        // ファイル名の重複を防ぐため、タイムスタンプ + ランダム文字列 + インデックスを使用
+        const randomSuffix = Math.random().toString(36).substring(2, 9);
+        const fileName = `${user.id}/${baseTimestamp}-${randomSuffix}-${i}-${sanitizedName}`;
+        
+        console.log(`AlbumsPage: 写真アップロード中 (${i + 1}/${albumData.photos.length}): ${fileName}`);
+        console.log(`AlbumsPage: 元のファイル名: ${originalName}`);
+        
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from("photos")
+          .upload(fileName, file, {
+            cacheControl: '3600',
+            upsert: false
+          });
+
+        if (uploadError) {
+          console.error(`AlbumsPage: 写真アップロードエラー (${i + 1}/${albumData.photos.length}):`, uploadError);
+          console.error("AlbumsPage: エラー詳細:", {
+            message: uploadError.message,
+            name: uploadError.name
+          });
+          throw new Error(`写真のアップロードに失敗しました: ${uploadError.message}`);
+        }
+
+        // 署名付きURLを取得（Storageバケットがpublicでない場合）
+        const { data: signedUrlData, error: signedUrlError } = await supabase.storage
+          .from("photos")
+          .createSignedUrl(fileName, 3600);
+
+        if (signedUrlError) {
+          console.warn("AlbumsPage: 署名付きURL取得エラー（アップロードは成功）:", signedUrlError);
+        }
+
+        uploadedPhotos.push({
+          storageKey: fileName,
+          publicUrl: signedUrlData?.signedUrl || ""
+        });
+      }
+
+      console.log("AlbumsPage: 写真アップロード完了", uploadedPhotos.length, "件");
+
+      // 2. albumsテーブルにアルバム情報を保存
+      console.log("AlbumsPage: アルバム情報を保存中...", {
+        title: albumData.title,
+        description: albumData.description,
+        is_public: albumData.isPublic,
+        owner_id: user.id
+      });
+      
+      const { data: album, error: albumError } = await supabase
       .from("albums")
       .insert({ 
-        title: "新しいアルバム",
-        description: "アルバムの説明を追加してください",
-        owner_id: user.id 
+          owner_id: user.id,
+          title: albumData.title,
+          description: albumData.description || null,
+          is_public: albumData.isPublic,
       })
-      .select();
+        .select()
+        .single();
 
-    if (data && data[0]) {
-      // 新しいアルバムをリストに追加
-      const newAlbum: DashboardAlbum = {
-        id: data[0].id,
-        title: data[0].title,
-        description: data[0].description || "アルバムの説明",
-        coverImage: "https://images.unsplash.com/photo-1587955793432-7c4ff80918ba?w=400",
-        photoCount: 0,
-        createdAt: data[0].created_at || data[0].updated_at,
-        category: "other",
-        isShared: false,
-      };
-      setAlbums(prev => [newAlbum, ...prev]);
+      if (albumError) {
+        console.error("AlbumsPage: アルバム保存エラー", albumError);
+        console.error("AlbumsPage: エラー詳細:", {
+          message: albumError.message,
+          details: albumError.details,
+          hint: albumError.hint,
+          code: albumError.code
+        });
+        throw new Error(`アルバムの保存に失敗しました: ${albumError.message}`);
+      }
+
+      console.log("AlbumsPage: アルバム保存完了", album.id);
+
+      // 3. photosテーブルに写真情報を保存
+      if (uploadedPhotos.length > 0) {
+        console.log("AlbumsPage: 写真情報を保存中...", uploadedPhotos.length, "件");
+        const photoInserts = uploadedPhotos.map((photo, index) => ({
+          album_id: album.id,
+          uploader_id: user.id,
+          storage_key: photo.storageKey,
+          mime_type: albumData.photos[index]?.type || null,
+          bytes: albumData.photos[index]?.size || null,
+        }));
+
+        const { error: photosError } = await supabase
+          .from("photos")
+          .insert(photoInserts);
+
+        if (photosError) {
+          console.error("AlbumsPage: 写真情報保存エラー", photosError);
+          console.error("AlbumsPage: エラー詳細:", {
+            message: photosError.message,
+            details: photosError.details,
+            hint: photosError.hint,
+            code: photosError.code
+          });
+          throw new Error(`写真情報の保存に失敗しました: ${photosError.message}`);
+        }
+
+        console.log("AlbumsPage: 写真情報保存完了", photoInserts.length, "件");
+      }
+
+      // 4. アルバム一覧を再取得
+      await fetchAlbums();
       
-      // アルバム詳細ページに遷移
-      router.push(`/albums/${data[0].id}`);
+      // 5. 作成したアルバムの詳細ページに遷移
+      setSelectedAlbumId(album.id);
+      setCurrentState("viewing");
+      router.push(`/albums/${album.id}`);
+
+    } catch (error) {
+      console.error("AlbumsPage: アルバム作成エラー", error);
+      const errorMessage = error instanceof Error ? error.message : "予期しないエラーが発生しました";
+      console.error("AlbumsPage: エラーメッセージ:", errorMessage);
+      alert(`アルバムの作成に失敗しました: ${errorMessage}`);
     }
-    console.log("アルバム作成結果", { data, error });
   };
 
   const handleOpenAlbum = (albumId: string) => {
@@ -442,11 +577,30 @@ export default function AlbumsPage() {
           </div>
         )}
 
+        {/* 条件分岐で画面を切り替え */}
+        {currentState === "dashboard" && (
         <Dashboard
           albums={albums}
           onCreateAlbum={handleCreateAlbum}
           onOpenAlbum={handleOpenAlbum}
         />
+        )}
+
+        {currentState === "creating" && (
+          <AlbumCreator
+            onBack={handleBackToDashboard}
+            onSave={handleSaveAlbum}
+          />
+        )}
+
+        {/* viewing状態の場合は、既存のアルバム詳細ページへの遷移処理で対応 */}
+        {currentState === "viewing" && selectedAlbumId && (
+          // 既にrouter.pushで遷移しているため、ここでは何も表示しない
+          // または、ローディング表示
+          <div className="flex items-center justify-center min-h-screen">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+          </div>
+        )}
       </div>
     </AuthGuard>
   );
