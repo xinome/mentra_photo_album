@@ -23,12 +23,12 @@ export default function LoginPage() {
     
     try {
       const { error: authError } = await supabase.auth.signInWithOtp({ 
-        email, 
-        options: { 
-          emailRedirectTo: getAuthRedirectUrl()
-        }
-      });
-      
+      email, 
+      options: { 
+        emailRedirectTo: getAuthRedirectUrl()
+      }
+    });
+    
       if (authError) {
         console.error("Magic Link送信エラー:", authError);
         setError(getAuthErrorMessage(authError));
@@ -43,7 +43,7 @@ export default function LoginPage() {
       console.error("予期しないエラー:", err);
       setError("予期しないエラーが発生しました。もう一度お試しください。");
     } finally {
-      setLoading(false);
+    setLoading(false);
     }
   };
 
@@ -53,11 +53,11 @@ export default function LoginPage() {
     
     try {
       const { error: authError } = await supabase.auth.signInWithOtp({ 
-        email, 
-        options: { 
-          emailRedirectTo: getAuthRedirectUrl()
-        }
-      });
+      email, 
+      options: { 
+        emailRedirectTo: getAuthRedirectUrl()
+      }
+    });
       
       if (authError) {
         console.error("Magic Link再送信エラー:", authError);
@@ -67,7 +67,7 @@ export default function LoginPage() {
       console.error("予期しないエラー:", err);
       setResendError("予期しないエラーが発生しました。もう一度お試しください。");
     } finally {
-      setLoading(false);
+    setLoading(false);
     }
   };
 
