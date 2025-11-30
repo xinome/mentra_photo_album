@@ -41,6 +41,8 @@ interface SharedAlbum {
 interface ShareData {
   album: {
     title: string;
+    description?: string;
+    category?: string;
   };
   photos: Array<{
     id: string;
@@ -96,11 +98,11 @@ export default function SharePage() {
         setAlbum({
           id: "shared",
           title: data.album?.title || "共有アルバム",
-          description: "共有されたアルバムです",
+          description: data.album?.description || "共有されたアルバムです",
           coverImage: photos.length > 0 ? photos[0].url : "",
           photos,
           createdAt: photos.length > 0 ? photos[0].uploadedAt : new Date().toISOString(),
-          category: "other",
+          category: (data.album?.category as 'wedding' | 'event' | 'family' | 'sports' | 'other') || 'other',
           contributors: [{ name: "投稿者" }],
           owner: { name: "オーナー" },
         });

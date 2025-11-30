@@ -1,16 +1,17 @@
 import { Suspense } from 'react';
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
-import { AlbumsListClient } from '@/components/AlbumsListClient';
+import { DashboardClient } from '@/components/DashboardClient';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Header } from '@/components/Header';
+import { AuthGuard } from '@/components/AuthGuard';
 
 export const metadata = {
-  title: 'アルバム一覧 | Mentra Photo Album',
-  description: '全てのアルバムを表示',
+  title: 'ダッシュボード | Mentra Photo Album',
+  description: '最近のアルバムと写真を管理',
 };
 
-async function getAllAlbums() {
+async function getRecentAlbums() {
   const supabase = await createClient();
   
   // 認証チェック
@@ -19,12 +20,13 @@ async function getAllAlbums() {
     redirect('/login');
   }
   
-  // 全アルバムを取得
+  // 最新6件のアルバムを取得
   const { data: albums, error } = await supabase
     .from('albums')
     .select('*')
     .eq('owner_id', user.id)
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .limit(6);
   
   if (error) {
     console.error('アルバム取得エラー:', error);
@@ -84,7 +86,37 @@ async function getAllAlbums() {
   return formattedAlbums;
 }
 
-export default async function AlbumsPage() {
+async function getStats() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) return { totalAlbums: 0, totalPhotos: 0, sharedAlbums: 0 };
+  
+  // 統計情報を取得
+  const { count: albumCount } = await supabase
+    .from('albums')
+    .select('*', { count: 'exact', head: true })
+    .eq('owner_id', user.id);
+  
+  const { count: photoCount } = await supabase
+    .from('photos')
+    .select('*', { count: 'exact', head: true })
+    .eq('uploader_id', user.id);
+  
+  const { count: sharedCount } = await supabase
+    .from('albums')
+    .select('*', { count: 'exact', head: true })
+    .eq('owner_id', user.id)
+    .eq('is_public', true);
+  
+  return {
+    totalAlbums: albumCount || 0,
+    totalPhotos: photoCount || 0,
+    sharedAlbums: sharedCount || 0,
+  };
+}
+
+export default async function DashboardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   
@@ -92,7 +124,10 @@ export default async function AlbumsPage() {
     redirect('/login');
   }
   
-  const albums = await getAllAlbums();
+  const [albums, stats] = await Promise.all([
+    getRecentAlbums(),
+    getStats(),
+  ]);
   
   // プロフィール情報を取得
   const { data: profile } = await supabase
@@ -110,22 +145,27 @@ export default async function AlbumsPage() {
           avatar: profile?.avatar_url,
         }}
       />
-      <Suspense fallback={<AlbumsListSkeleton />}>
-        <AlbumsListClient albums={albums} />
+      <Suspense fallback={<DashboardSkeleton />}>
+        <DashboardClient albums={albums} stats={stats} />
       </Suspense>
     </div>
   );
 }
 
-function AlbumsListSkeleton() {
+function DashboardSkeleton() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <Skeleton className="h-12 w-64 mb-8" />
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {[...Array(12)].map((_, i) => (
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {[...Array(3)].map((_, i) => (
+          <Skeleton key={i} className="h-32" />
+        ))}
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[...Array(6)].map((_, i) => (
           <Skeleton key={i} className="h-80" />
         ))}
       </div>
     </div>
   );
 }
+

@@ -52,15 +52,15 @@ export default function AuthCallbackPage() {
           return;
         }
 
-        // プロフィール設定済みの場合はアルバムページへ
-        console.log("AuthCallbackPage: プロフィール設定済み - アルバムページへ");
-        router.push("/albums");
+        // プロフィール設定済みの場合はダッシュボードへ
+        console.log("AuthCallbackPage: プロフィール設定済み - ダッシュボードへ");
+        router.push("/dashboard");
       } catch (err) {
         console.error("AuthCallbackPage: エラー", err);
         setError("プロフィールの確認中にエラーが発生しました。もう一度お試しください。");
-        // エラー時は安全のためアルバムページへ
+        // エラー時は安全のためダッシュボードへ
         setTimeout(() => {
-          router.push("/albums");
+          router.push("/dashboard");
         }, 3000);
       } finally {
         setChecking(false);

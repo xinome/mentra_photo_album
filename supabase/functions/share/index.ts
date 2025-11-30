@@ -42,7 +42,7 @@ serve(async (req: Request) => {
     // アルバム情報
     const { data: album, error: albumErr } = await supabase
       .from("albums")
-      .select("id, title, description, cover_photo_id, is_public")
+      .select("id, title, description, cover_photo_id, is_public, category")
       .eq("id", share.album_id)
       .single();
 
