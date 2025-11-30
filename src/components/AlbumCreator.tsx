@@ -110,7 +110,7 @@ export function AlbumCreator({ onBack, onSave }: AlbumCreatorProps) {
   const isFormValid = albumData.title && albumData.category && photos.length > 0;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
@@ -128,7 +128,7 @@ export function AlbumCreator({ onBack, onSave }: AlbumCreatorProps) {
 
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Album Information */}
-          <Card>
+          <Card className="bg-white border shadow-sm">
             <CardHeader>
               <CardTitle>アルバム情報</CardTitle>
               <CardDescription>
@@ -142,6 +142,7 @@ export function AlbumCreator({ onBack, onSave }: AlbumCreatorProps) {
                   <Input
                     id="title"
                     placeholder="例: 山田家結婚式"
+                    className="bg-white"
                     value={albumData.title}
                     onChange={(e) =>
                       setAlbumData({ ...albumData, title: e.target.value })
@@ -158,10 +159,10 @@ export function AlbumCreator({ onBack, onSave }: AlbumCreatorProps) {
                       setAlbumData({ ...albumData, category: value })
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-white">
                       <SelectValue placeholder="カテゴリを選択" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white z-50">
                       <SelectItem value="wedding">結婚式</SelectItem>
                       <SelectItem value="event">イベント</SelectItem>
                       <SelectItem value="family">家族</SelectItem>
@@ -179,6 +180,7 @@ export function AlbumCreator({ onBack, onSave }: AlbumCreatorProps) {
                   id="description"
                   placeholder="アルバムの説明を入力してください（任意）"
                   rows={3}
+                  className="bg-white"
                   value={albumData.description}
                   onChange={(e) =>
                     setAlbumData({ ...albumData, description: e.target.value })
@@ -186,26 +188,40 @@ export function AlbumCreator({ onBack, onSave }: AlbumCreatorProps) {
                 />
               </div>
 
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <div className="space-y-1">
-                  <Label htmlFor="public">公開設定</Label>
-                  <p className="text-sm text-muted-foreground">
-                    リンクを知っている人なら誰でも閲覧できます
-                  </p>
+              <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="space-y-1">
+                    <Label htmlFor="public" className="text-base font-medium">公開設定</Label>
+                    <p className="text-sm text-muted-foreground">
+                      リンクを知っている人なら誰でも閲覧できます
+                    </p>
+                  </div>
+                  <Switch
+                    id="public"
+                    checked={albumData.isPublic}
+                    onCheckedChange={(checked) =>
+                      setAlbumData({ ...albumData, isPublic: checked })
+                    }
+                  />
                 </div>
-                <Switch
-                  id="public"
-                  checked={albumData.isPublic}
-                  onCheckedChange={(checked) =>
-                    setAlbumData({ ...albumData, isPublic: checked })
-                  }
-                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    // 公開設定の詳細設定（将来的にモーダルなどを開く）
+                    alert("公開設定の詳細設定機能は今後実装予定です");
+                  }}
+                  className="w-full"
+                >
+                  設定
+                </Button>
               </div>
             </CardContent>
           </Card>
 
           {/* Photo Upload */}
-          <Card>
+          <Card className="bg-white border shadow-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Camera className="h-5 w-5" />

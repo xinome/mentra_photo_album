@@ -14,13 +14,15 @@ interface MagicLinkLoginProps {
   error?: string | null;
 }
 
-export function MagicLinkLogin({ onSendMagicLink, isLoading = false, error }: MagicLinkLoginProps) {
+export function MagicLinkLogin(props: MagicLinkLoginProps) {
+  const { onSendMagicLink, isLoading = false, error } = props;
   const [email, setEmail] = useState("");
+  const trimmedEmail = email.trim();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
-      onSendMagicLink(email);
+    if (trimmedEmail) {
+      onSendMagicLink(trimmedEmail);
     }
   };
 
@@ -156,7 +158,7 @@ export function MagicLinkLogin({ onSendMagicLink, isLoading = false, error }: Ma
                 <Button 
                   type="submit" 
                   className="w-full h-12 gap-2" 
-                  disabled={!email || isLoading}
+                  disabled={!trimmedEmail || isLoading}
                 >
                   {isLoading ? (
                     <>

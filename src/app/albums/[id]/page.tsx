@@ -121,8 +121,8 @@ export default function AlbumDetailPage() {
         coverImage,
         photos,
         createdAt: albumData.created_at || albumData.updated_at,
-        category: "other",
-        isShared: false, // TODO: 共有情報を取得
+        category: (albumData.category as 'wedding' | 'event' | 'family' | 'sports' | 'other') || 'other',
+        isShared: albumData.is_public || false,
         contributors: [
           {
             name: user?.email?.split("@")[0] || "ユーザー",
