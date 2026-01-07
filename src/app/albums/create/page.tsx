@@ -106,13 +106,14 @@ export default function CreateAlbumPage() {
         throw new Error(`アルバムの保存に失敗しました: ${albumError.message}`);
       }
 
-      console.log("CreateAlbumPage: アルバム保存完了", album.id);
+      const savedAlbum = album as any;
+      console.log("CreateAlbumPage: アルバム保存完了", savedAlbum.id);
 
       // 3. photosテーブルに写真情報を保存
       if (uploadedPhotos.length > 0) {
         console.log("CreateAlbumPage: 写真情報を保存中...", uploadedPhotos.length, "件");
         const photoInserts = uploadedPhotos.map((photo, index) => ({
-          album_id: album.id,
+          album_id: savedAlbum.id,
           uploader_id: user.id,
           storage_key: photo.storageKey,
           mime_type: albumData.photos[index]?.type || null,
@@ -132,7 +133,7 @@ export default function CreateAlbumPage() {
       }
 
       // 4. 作成したアルバムの詳細ページに遷移
-      router.push(`/albums/${album.id}`);
+      router.push(`/albums/${savedAlbum.id}`);
 
     } catch (error) {
       console.error("CreateAlbumPage: アルバム作成エラー", error);

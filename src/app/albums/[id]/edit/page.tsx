@@ -169,8 +169,8 @@ export default function AlbumEditPage() {
       }
 
       // アルバム情報を更新
-      const { error: updateError } = await supabase
-        .from("albums")
+      const { error: updateError } = await (supabase
+        .from("albums") as any)
         .update({
           title: updateData.title,
           description: updateData.description,
