@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { Camera, User, Settings, LogOut, Images, ExternalLink, PlayCircle } from "lucide-react";
+import { Camera, User, Settings, LogOut, Images, ExternalLink, PlayCircle, Database } from "lucide-react";
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
@@ -69,6 +69,16 @@ export function Header({ user, onLogout }: HeaderProps) {
                 >
                   アルバム一覧
                 </Link>
+                <Link 
+                  href="/storage"
+                  className={`text-sm transition-colors ${
+                    pathname === '/storage' 
+                      ? 'text-blue-600 font-medium' 
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  ストレージ
+                </Link>
               </nav>
             </>
           ) : null}
@@ -125,6 +135,16 @@ export function Header({ user, onLogout }: HeaderProps) {
                   >
                     <Settings className="h-4 w-4" />
                     <span>アカウント設定</span>
+                  </button>
+                  <button
+                    className="w-full flex items-center gap-2 px-2 py-1.5 text-sm hover:bg-gray-100 text-left"
+                    onClick={() => {
+                      setOpen(false);
+                      router.push("/storage");
+                    }}
+                  >
+                    <Database className="h-4 w-4" />
+                    <span>ストレージ</span>
                   </button>
                   <button
                     className="w-full flex items-center gap-2 px-2 py-1.5 text-sm hover:bg-gray-100 text-left"
