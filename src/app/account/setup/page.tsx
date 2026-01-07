@@ -26,7 +26,7 @@ export default function ProfileSetupPage() {
         .eq("user_id", user.id)
         .single();
 
-      if (profile && profile.display_name) {
+      if (profile && (profile as any).display_name) {
         // プロフィールが既に設定されている場合はアルバムページへ
         router.push("/albums");
       } else {
@@ -67,7 +67,7 @@ export default function ProfileSetupPage() {
           avatar_url: profileData.avatar || null,
           bio: profileData.bio || null,
           updated_at: new Date().toISOString(),
-        })
+        } as any)
         .select();
 
       if (error) {

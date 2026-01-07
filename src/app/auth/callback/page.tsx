@@ -46,7 +46,7 @@ export default function AuthCallbackPage() {
         console.log("AuthCallbackPage: プロフィール確認結果", { profile, profileError });
 
         // プロフィールが存在しないか、display_nameが設定されていない場合
-        if (!profile || !profile.display_name) {
+        if (!profile || !(profile as any).display_name) {
           console.log("AuthCallbackPage: プロフィール未設定 - プロフィール設定ページへ");
           router.push("/account/setup");
           return;
