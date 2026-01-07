@@ -52,7 +52,8 @@ export default function AlbumEditPage() {
       }
 
       // 作成者のみ編集可能
-      if (albumData.owner_id !== user.id) {
+      const album = albumData as any;
+      if (album.owner_id !== user.id) {
         alert("このアルバムを編集する権限がありません");
         router.push(`/albums/${albumId}`);
         return;
@@ -60,38 +61,39 @@ export default function AlbumEditPage() {
 
       // カバー画像のURLを取得
       let coverImageUrl: string | undefined;
-      if (albumData.cover_photo_id) {
+      if (album.cover_photo_id) {
         const { data: coverPhoto } = await supabase
           .from("photos")
           .select("storage_key")
-          .eq("id", albumData.cover_photo_id)
+          .eq("id", album.cover_photo_id)
           .single();
 
-        if (coverPhoto?.storage_key) {
-          if (coverPhoto.storage_key.startsWith('http')) {
-            coverImageUrl = coverPhoto.storage_key;
+        if (coverPhoto && (coverPhoto as any).storage_key) {
+          const storageKey = (coverPhoto as any).storage_key;
+          if (storageKey.startsWith('http')) {
+            coverImageUrl = storageKey;
           } else {
             const { data: signedUrl } = await supabase.storage
               .from("photos")
-              .createSignedUrl(coverPhoto.storage_key, 3600);
+              .createSignedUrl(storageKey, 3600);
             coverImageUrl = signedUrl?.signedUrl;
           }
         }
       }
 
       // カバー画像がない場合はカテゴリのデフォルト画像を使用
-      if (!coverImageUrl && albumData.category) {
-        coverImageUrl = getCategoryDefaultImage(albumData.category);
+      if (!coverImageUrl && album.category) {
+        coverImageUrl = getCategoryDefaultImage(album.category);
       }
 
       setAlbum({
-        id: albumData.id,
-        title: albumData.title,
-        description: albumData.description || "",
-        category: albumData.category || "other",
-        isPublic: albumData.is_public || false,
+        id: album.id,
+        title: album.title,
+        description: album.description || "",
+        category: album.category || "other",
+        isPublic: album.is_public || false,
         coverImageUrl,
-        ownerId: albumData.owner_id,
+        ownerId: album.owner_id,
       });
 
       setLoading(false);
@@ -143,7 +145,7 @@ export default function AlbumEditPage() {
             album_id: albumId,
             storage_key: fileName,
             caption: "カバー画像",
-          })
+          } as any)
           .select()
           .single();
 
@@ -154,7 +156,7 @@ export default function AlbumEditPage() {
           return;
         }
 
-        coverPhotoId = photoData.id;
+        coverPhotoId = photoData ? (photoData as any).id : null;
       } else {
         // カバー画像は変更なし（既存のものを維持）
         const { data: existingAlbum } = await supabase
@@ -163,7 +165,7 @@ export default function AlbumEditPage() {
           .eq("id", albumId)
           .single();
 
-        coverPhotoId = existingAlbum?.cover_photo_id || null;
+        coverPhotoId = existingAlbum ? (existingAlbum as any).cover_photo_id || null : null;
       }
 
       // アルバム情報を更新

@@ -97,7 +97,7 @@ export default function CreateAlbumPage() {
           title: albumData.title,
           description: albumData.description || null,
           is_public: albumData.isPublic,
-        })
+        } as any)
         .select()
         .single();
 
@@ -121,7 +121,7 @@ export default function CreateAlbumPage() {
 
         const { error: photosError } = await supabase
           .from("photos")
-          .insert(photoInserts);
+          .insert(photoInserts as any);
 
         if (photosError) {
           console.error("CreateAlbumPage: 写真情報保存エラー", photosError);

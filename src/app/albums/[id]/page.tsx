@@ -72,7 +72,8 @@ export default function AlbumDetailPage() {
       }
 
       // 作成者かどうかを確認
-      setIsOwner(albumData.owner_id === user?.id);
+      const album = albumData as any;
+      setIsOwner(album.owner_id === user?.id);
 
       // 写真を取得
       const { data: photosData, error: photosError } = await supabase
@@ -87,14 +88,15 @@ export default function AlbumDetailPage() {
       const photos: Photo[] = await Promise.all(
         (photosData || []).map(async (photo: DbPhoto) => {
           let photoUrl = "";
+          const photoData = photo as any;
           
           // storage_keyがURLの場合は直接使用、それ以外はStorageから取得
-          if (photo.storage_key.startsWith('http')) {
-            photoUrl = photo.storage_key;
-          } else {
+          if (photoData.storage_key?.startsWith('http')) {
+            photoUrl = photoData.storage_key;
+          } else if (photoData.storage_key) {
             const { data: signedUrl } = await supabase.storage
               .from("photos")
-              .createSignedUrl(photo.storage_key, 3600);
+              .createSignedUrl(photoData.storage_key, 3600);
             photoUrl = signedUrl?.signedUrl || "";
           }
 
@@ -117,43 +119,44 @@ export default function AlbumDetailPage() {
       let coverImage: string;
       
       // カバー画像が設定されている場合はそれを取得
-      if (albumData.cover_photo_id) {
+      if (album.cover_photo_id) {
         const { data: coverPhoto } = await supabase
           .from("photos")
           .select("storage_key")
-          .eq("id", albumData.cover_photo_id)
+          .eq("id", album.cover_photo_id)
           .single();
 
-        if (coverPhoto?.storage_key) {
-          if (coverPhoto.storage_key.startsWith('http')) {
-            coverImage = coverPhoto.storage_key;
+        if (coverPhoto && (coverPhoto as any).storage_key) {
+          const storageKey = (coverPhoto as any).storage_key;
+          if (storageKey.startsWith('http')) {
+            coverImage = storageKey;
           } else {
             const { data: signedUrl } = await supabase.storage
               .from("photos")
-              .createSignedUrl(coverPhoto.storage_key, 3600);
-            coverImage = signedUrl?.signedUrl || getCategoryDefaultImage(albumData.category);
+              .createSignedUrl(storageKey, 3600);
+            coverImage = signedUrl?.signedUrl || getCategoryDefaultImage(album.category);
           }
         } else {
           // カバー画像が取得できない場合はカテゴリのデフォルト画像を使用
-          coverImage = getCategoryDefaultImage(albumData.category);
+          coverImage = getCategoryDefaultImage(album.category);
         }
       } else if (photos.length > 0) {
         // カバー画像が設定されていない場合は最初の写真を使用
         coverImage = photos[0].url;
       } else {
         // 写真もない場合はカテゴリのデフォルト画像を使用
-        coverImage = getCategoryDefaultImage(albumData.category);
+        coverImage = getCategoryDefaultImage(album.category);
       }
 
       setAlbum({
-        id: albumData.id,
-        title: albumData.title,
-        description: albumData.description || "アルバムの説明",
+        id: album.id,
+        title: album.title,
+        description: album.description || "アルバムの説明",
         coverImage,
         photos,
-        createdAt: albumData.created_at || albumData.updated_at,
-        category: (albumData.category as 'wedding' | 'event' | 'family' | 'sports' | 'other') || 'other',
-        isShared: albumData.is_public || false,
+        createdAt: album.created_at || album.updated_at,
+        category: (album.category as 'wedding' | 'event' | 'family' | 'sports' | 'other') || 'other',
+        isShared: album.is_public || false,
         contributors: [
           {
             name: user?.email?.split("@")[0] || "ユーザー",
