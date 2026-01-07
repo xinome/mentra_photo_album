@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft, Download, Share2, Heart, Calendar, Users, Camera, Grid, List, Search, Filter } from "lucide-react";
+import { ArrowLeft, Download, Share2, Heart, Calendar, Users, Camera, Grid, List, Search, Filter, Edit } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Card, CardContent } from "./ui/card";
@@ -46,6 +46,8 @@ interface AlbumViewerProps {
   onShare: () => void;
   onDownload: () => void;
   onLikePhoto: (photoId: string) => void;
+  onEdit?: () => void;
+  canEdit?: boolean;
 }
 
 const categoryLabels = {
@@ -56,7 +58,7 @@ const categoryLabels = {
   other: "その他",
 };
 
-export function AlbumViewer({ album, onBack, onShare, onDownload, onLikePhoto }: AlbumViewerProps) {
+export function AlbumViewer({ album, onBack, onShare, onDownload, onLikePhoto, onEdit, canEdit }: AlbumViewerProps) {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("newest");
@@ -102,6 +104,12 @@ export function AlbumViewer({ album, onBack, onShare, onDownload, onLikePhoto }:
             </div>
 
             <div className="flex items-center gap-2">
+              {canEdit && onEdit && (
+                <Button variant="outline" onClick={onEdit} className="gap-2">
+                  <Edit className="h-4 w-4" />
+                  編集
+                </Button>
+              )}
               <Button variant="outline" onClick={onShare} className="gap-2">
                 <Share2 className="h-4 w-4" />
                 共有

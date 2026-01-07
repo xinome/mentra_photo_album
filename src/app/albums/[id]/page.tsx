@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { AlbumViewer } from "@/components/AlbumViewer";
 import { Header } from "@/components/Header";
 import { useAuth } from "@/components/AuthProvider";
+import { getCategoryDefaultImage } from "@/lib/category-images";
 
 interface DbPhoto {
   id: string;
@@ -51,6 +52,7 @@ export default function AlbumDetailPage() {
   
   const [album, setAlbum] = useState<Album | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isOwner, setIsOwner] = useState(false);
 
   useEffect(() => {
     const fetchAlbumData = async () => {
@@ -68,6 +70,9 @@ export default function AlbumDetailPage() {
         setLoading(false);
         return;
       }
+
+      // 作成者かどうかを確認
+      setIsOwner(albumData.owner_id === user?.id);
 
       // 写真を取得
       const { data: photosData, error: photosError } = await supabase
@@ -109,9 +114,35 @@ export default function AlbumDetailPage() {
       );
 
       // カバー画像を取得
-      let coverImage = "https://images.unsplash.com/photo-1587955793432-7c4ff80918ba?w=400";
-      if (photos.length > 0) {
+      let coverImage: string;
+      
+      // カバー画像が設定されている場合はそれを取得
+      if (albumData.cover_photo_id) {
+        const { data: coverPhoto } = await supabase
+          .from("photos")
+          .select("storage_key")
+          .eq("id", albumData.cover_photo_id)
+          .single();
+
+        if (coverPhoto?.storage_key) {
+          if (coverPhoto.storage_key.startsWith('http')) {
+            coverImage = coverPhoto.storage_key;
+          } else {
+            const { data: signedUrl } = await supabase.storage
+              .from("photos")
+              .createSignedUrl(coverPhoto.storage_key, 3600);
+            coverImage = signedUrl?.signedUrl || getCategoryDefaultImage(albumData.category);
+          }
+        } else {
+          // カバー画像が取得できない場合はカテゴリのデフォルト画像を使用
+          coverImage = getCategoryDefaultImage(albumData.category);
+        }
+      } else if (photos.length > 0) {
+        // カバー画像が設定されていない場合は最初の写真を使用
         coverImage = photos[0].url;
+      } else {
+        // 写真もない場合はカテゴリのデフォルト画像を使用
+        coverImage = getCategoryDefaultImage(albumData.category);
       }
 
       setAlbum({
@@ -169,6 +200,10 @@ export default function AlbumDetailPage() {
     // TODO: いいね機能の実装
   };
 
+  const handleEdit = () => {
+    router.push(`/albums/${id}/edit`);
+  };
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push("/login");
@@ -212,6 +247,8 @@ export default function AlbumDetailPage() {
         onShare={handleShare}
         onDownload={handleDownload}
         onLikePhoto={handleLikePhoto}
+        onEdit={handleEdit}
+        canEdit={isOwner}
       />
     </div>
   );

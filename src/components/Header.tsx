@@ -120,7 +120,7 @@ export function Header({ user, onLogout }: HeaderProps) {
                     className="w-full flex items-center gap-2 px-2 py-1.5 text-sm hover:bg-gray-100 text-left"
                     onClick={() => {
                       setOpen(false);
-                      router.push("/account/setup");
+                      router.push("/account");
                     }}
                   >
                     <Settings className="h-4 w-4" />

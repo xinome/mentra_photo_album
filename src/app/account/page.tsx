@@ -5,20 +5,53 @@ import { useAuth } from "@/components/AuthProvider";
 import { AuthGuard } from "@/components/AuthGuard";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, Settings } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Header } from "@/components/Header";
+import { ProfileSection } from "./components/ProfileSection";
+import { SecuritySection } from "./components/SecuritySection";
+import { AccountManagementSection } from "./components/AccountManagementSection";
+import { PrivacySection } from "./components/PrivacySection";
+import { DangerZoneSection } from "./components/DangerZoneSection";
 
 interface Profile {
   user_id: string;
   display_name: string | null;
   avatar_url: string | null;
+  bio: string | null;
   created_at: string;
 }
 
 export default function AccountPage() {
   const { user } = useAuth();
+  const router = useRouter();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+  // アバターURLを処理する関数（パスの場合は署名付きURLを生成）
+  const processAvatarUrl = async (avatarUrl: string | null): Promise<string | null> => {
+    if (!avatarUrl) return null;
+    
+    // 既にURLの場合はそのまま返す
+    if (avatarUrl.startsWith('http')) {
+      return avatarUrl;
+    }
+    
+    // パスの場合は署名付きURLを生成
+    if (avatarUrl.startsWith('avatars/')) {
+      const { data: signedUrlData } = await supabase.storage
+        .from('photos')
+        .createSignedUrl(avatarUrl, 3600);
+      
+      return signedUrlData?.signedUrl || null;
+    }
+    
+    return avatarUrl;
+  };
 
   // プロファイル情報の取得
   useEffect(() => {
@@ -43,12 +76,24 @@ export default function AccountPage() {
         }
 
         // プロファイルが存在しない場合は新規作成用のデータを準備
-        setProfile(data || {
+        let profileData: Profile = data || {
           user_id: user.id,
           display_name: null,
           avatar_url: null,
+          bio: null,
           created_at: new Date().toISOString()
-        });
+        };
+
+        // アバターURLを処理
+        if (profileData.avatar_url) {
+          const processedUrl = await processAvatarUrl(profileData.avatar_url);
+          profileData = {
+            ...profileData,
+            avatar_url: processedUrl
+          };
+        }
+
+        setProfile(profileData);
       } catch (err) {
         console.error('プロファイル取得エラー:', err);
         setMessage({ type: 'error', text: 'プロファイルの取得に失敗しました' });
@@ -61,28 +106,112 @@ export default function AccountPage() {
   }, [user]);
 
   // プロファイル更新
-  const updateProfile = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!user || !profile) return;
+  const handleProfileUpdate = async (data: {
+    displayName: string;
+    bio: string;
+    avatarFile?: File;
+    removeAvatar?: boolean;
+  }) => {
+    if (!user) return;
 
     setSaving(true);
     setMessage(null);
 
     try {
-      const formData = new FormData(e.currentTarget);
-      const displayName = formData.get('display_name') as string;
+      let avatarUrl = profile?.avatar_url || null;
 
-      console.log("AccountPage: プロファイル更新開始", { displayName });
+      // アバター画像の削除
+      if (data.removeAvatar && avatarUrl) {
+        // 署名付きURLからパスを抽出するか、直接パスを使用
+        let oldPath: string | null = null;
+        
+        // 署名付きURLの場合、パラメータを除去してパスを抽出
+        if (avatarUrl.includes('avatars/')) {
+          const urlParts = avatarUrl.split('avatars/');
+          if (urlParts.length > 1) {
+            const pathPart = urlParts[1].split('?')[0]; // クエリパラメータを除去
+            oldPath = `avatars/${pathPart}`;
+          }
+        } else if (avatarUrl.startsWith('avatars/')) {
+          oldPath = avatarUrl;
+        }
 
+        if (oldPath) {
+          const { error: deleteError } = await supabase.storage
+            .from('photos')
+            .remove([oldPath]);
+          
+          if (deleteError) {
+            console.warn('既存アバターの削除エラー（無視）:', deleteError);
+          }
+        }
+        
+        avatarUrl = null;
+      }
+
+      // アバター画像のアップロード
+      if (data.avatarFile) {
+        // 既存のアバターを削除（存在する場合）
+        if (avatarUrl) {
+          let oldPath: string | null = null;
+          
+          if (avatarUrl.includes('avatars/')) {
+            const urlParts = avatarUrl.split('avatars/');
+            if (urlParts.length > 1) {
+              const pathPart = urlParts[1].split('?')[0];
+              oldPath = `avatars/${pathPart}`;
+            }
+          } else if (avatarUrl.startsWith('avatars/')) {
+            oldPath = avatarUrl;
+          }
+
+          if (oldPath) {
+            const { error: deleteError } = await supabase.storage
+              .from('photos')
+              .remove([oldPath]);
+            
+            if (deleteError) {
+              console.warn('既存アバターの削除エラー（無視）:', deleteError);
+            }
+          }
+        }
+
+        const fileExt = data.avatarFile.name.split('.').pop();
+        const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+        const filePath = `avatars/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('photos')
+          .upload(filePath, data.avatarFile, {
+            cacheControl: '3600',
+            upsert: false,
+          });
+
+        if (uploadError) {
+          console.error('アバターアップロードエラー:', uploadError);
+          setMessage({ type: 'error', text: 'アバター画像のアップロードに失敗しました' });
+          setSaving(false);
+          return;
+        }
+
+        // 署名付きURLを取得（1年間有効）
+        const { data: signedUrlData } = await supabase.storage
+          .from('photos')
+          .createSignedUrl(filePath, 31536000);
+
+        avatarUrl = signedUrlData?.signedUrl || filePath;
+      }
+
+      // プロファイル更新
       const { error } = await supabase
         .from('profiles')
         .upsert({
           user_id: user.id,
-          display_name: displayName || null,
+          display_name: data.displayName || null,
+          bio: data.bio || null,
+          avatar_url: avatarUrl || null,
           updated_at: new Date().toISOString()
-        });
-
-      console.log("AccountPage: プロファイル更新結果", { error });
+        } as any);
 
       if (error) {
         console.error('プロファイル更新エラー:', error);
@@ -91,7 +220,18 @@ export default function AccountPage() {
       }
 
       setMessage({ type: 'success', text: 'プロファイルを更新しました' });
-      setProfile(prev => prev ? { ...prev, display_name: displayName || null } : null);
+      
+      // プロファイルを更新
+      const updatedProfile = {
+        ...profile!,
+        display_name: data.displayName || null,
+        bio: data.bio || null,
+        avatar_url: avatarUrl,
+      };
+      setProfile(updatedProfile);
+      
+      // アバター画像のプレビューを更新（ProfileSectionコンポーネントに反映される）
+      // コンポーネントの再レンダリングで自動的に反映されます
     } catch (err) {
       console.error('プロファイル更新エラー:', err);
       setMessage({ type: 'error', text: 'プロファイルの更新に失敗しました' });
@@ -101,15 +241,11 @@ export default function AccountPage() {
   };
 
   // パスワード変更
-  const changePassword = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handlePasswordChange = async (password: string) => {
     setSaving(true);
     setMessage(null);
 
     try {
-      const formData = new FormData(e.currentTarget);
-      const password = formData.get('password') as string;
-
       console.log("AccountPage: パスワード変更開始");
 
       const { error } = await supabase.auth.updateUser({
@@ -125,7 +261,6 @@ export default function AccountPage() {
       }
 
       setMessage({ type: 'success', text: 'パスワードを変更しました' });
-      (e.target as HTMLFormElement).reset();
     } catch (err) {
       console.error('パスワード変更エラー:', err);
       setMessage({ type: 'error', text: 'パスワードの変更に失敗しました' });
@@ -134,137 +269,163 @@ export default function AccountPage() {
     }
   };
 
+  // プライバシー設定更新
+  const handlePrivacyUpdate = async (settings: {
+    profileVisibility: boolean;
+    dataSharing: boolean;
+  }) => {
+    // 将来的にデータベースに保存する場合はここで実装
+    console.log("プライバシー設定更新:", settings);
+    setMessage({ type: 'success', text: 'プライバシー設定を更新しました' });
+  };
+
+  // アカウント削除
+  const handleDeleteAccount = async (confirmText: string) => {
+    if (confirmText !== "削除") {
+      setMessage({ type: 'error', text: '確認テキストが正しくありません' });
+      return;
+    }
+
+    setDeleting(true);
+    setMessage(null);
+
+    try {
+      if (!user?.id) {
+        setMessage({ type: 'error', text: 'ユーザー情報が見つかりません' });
+        return;
+      }
+
+      // プロフィールを削除
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (profileError) {
+        console.error('プロフィール削除エラー:', profileError);
+      }
+
+      // 注意: Supabase Authのアカウント削除はサーバーサイドでのみ可能です
+      // クライアントサイドでは、プロフィールとデータを削除してからログアウトします
+      // 完全なアカウント削除が必要な場合は、サーバーサイドのAPIエンドポイントを作成してください
+
+      setMessage({ 
+        type: 'success', 
+        text: 'プロフィールデータを削除しました。アカウントの完全削除についてはサポートにお問い合わせください。' 
+      });
+
+      // 3秒後にログアウト
+      setTimeout(async () => {
+        await supabase.auth.signOut();
+        router.push('/login');
+      }, 3000);
+    } catch (err) {
+      console.error('アカウント削除エラー:', err);
+      setMessage({ type: 'error', text: 'アカウントの削除に失敗しました' });
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  // ログアウト処理
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push('/login');
+  };
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
   }
 
   return (
     <AuthGuard requireAuth={true} redirectTo="/login">
-      <main className="mx-auto max-w-2xl p-6 space-y-8">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold">アカウント設定</h1>
-          <Link
-            href="/albums" 
-            className="text-blue-600 hover:text-blue-800 text-sm"
-          >
-            ← アルバムに戻る
-          </Link>
-        </div>
-
-        {/* メッセージ表示 */}
-        {message && (
-          <div className={`p-4 rounded ${
-            message.type === 'success' 
-              ? 'bg-green-100 text-green-700 border border-green-200' 
-              : 'bg-red-100 text-red-700 border border-red-200'
-          }`}>
-            {message.text}
-          </div>
-        )}
-
-        {/* 基本情報セクション */}
-        <section className="bg-white border rounded-lg p-6">
-          <h2 className="text-lg font-semibold mb-4">基本情報</h2>
-          
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                メールアドレス
-              </label>
-              <input
-                type="email"
-                value={user?.email || ''}
-                disabled
-                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                メールアドレスは変更できません
-              </p>
-            </div>
-
-            <form onSubmit={updateProfile}>
-              <div>
-                <label htmlFor="display_name" className="block text-sm font-medium text-gray-700 mb-1">
-                  表示名
-                </label>
-                <input
-                  type="text"
-                  id="display_name"
-                  name="display_name"
-                  defaultValue={profile?.display_name || ''}
-                  placeholder="表示名を入力"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+        <Header
+          user={{
+            name: profile?.display_name || user?.email?.split('@')[0] || 'ユーザー',
+            email: user?.email || '',
+            avatar: profile?.avatar_url || undefined,
+          }}
+          onLogout={handleLogout}
+        />
+        <main className="mx-auto max-w-4xl p-4 sm:p-6 lg:p-8 space-y-6">
+          {/* ヘッダー */}
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                <Settings className="h-5 w-5 text-white" />
               </div>
-              
-              <button
-                type="submit"
-                disabled={saving}
-                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {saving ? '保存中...' : '保存'}
-              </button>
-            </form>
+              <div>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  アカウント設定
+                </h1>
+                <p className="text-sm text-muted-foreground mt-0.5">
+                  プロフィールとセキュリティ設定を管理
+                </p>
+              </div>
+            </div>
+            <Button variant="outline" asChild className="border-2 hover:bg-white/80">
+              <Link href="/albums" className="gap-2">
+                <ArrowLeft className="h-4 w-4" />
+                アルバムに戻る
+              </Link>
+            </Button>
           </div>
-        </section>
 
-        {/* セキュリティセクション */}
-        <section className="bg-white border rounded-lg p-6">
-          <h2 className="text-lg font-semibold mb-4">セキュリティ</h2>
-          
-          <form onSubmit={changePassword} className="space-y-4">
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                新しいパスワード
-              </label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                required
-                minLength={6}
-                placeholder="新しいパスワードを入力"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                6文字以上で入力してください
-              </p>
+          {/* メッセージ表示 */}
+          {message && (
+            <div className={`p-4 rounded-xl shadow-md border-2 ${
+              message.type === 'success' 
+                ? 'bg-gradient-to-r from-green-50 to-emerald-50 text-green-800 border-green-200 shadow-green-100/50' 
+                : 'bg-gradient-to-r from-red-50 to-rose-50 text-red-800 border-red-200 shadow-red-100/50'
+            }`}>
+              <div className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full ${
+                  message.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+                }`} />
+                <span className="font-medium">{message.text}</span>
+              </div>
             </div>
-            
-            <button
-              type="submit"
-              disabled={saving}
-              className="px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {saving ? '変更中...' : 'パスワードを変更'}
-            </button>
-          </form>
-        </section>
+          )}
 
-        {/* アカウント情報セクション */}
-        <section className="bg-white border rounded-lg p-6">
-          <h2 className="text-lg font-semibold mb-4">アカウント情報</h2>
-          
-          <div className="space-y-2 text-sm text-gray-600">
-            <div className="flex justify-between">
-              <span>ユーザーID:</span>
-              <span className="font-mono text-xs">{user?.id}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>アカウント作成日:</span>
-              <span>{user?.created_at ? new Date(user.created_at).toLocaleDateString('ja-JP') : '-'}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>最終ログイン:</span>
-              <span>{user?.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleDateString('ja-JP') : '-'}</span>
-            </div>
+          {/* セクション */}
+          <div className="space-y-6">
+            <ProfileSection
+              email={user?.email || ''}
+              displayName={profile?.display_name || null}
+              bio={profile?.bio || null}
+              avatarUrl={profile?.avatar_url || null}
+              onUpdate={handleProfileUpdate}
+              saving={saving}
+            />
+
+            <SecuritySection
+              onChangePassword={handlePasswordChange}
+              saving={saving}
+            />
+
+            <AccountManagementSection
+              userId={user?.id || ''}
+              createdAt={user?.created_at || null}
+              lastSignInAt={user?.last_sign_in_at || null}
+            />
+
+            <PrivacySection
+              onPrivacyUpdate={handlePrivacyUpdate}
+              saving={saving}
+            />
+
+            <DangerZoneSection
+              onDeleteAccount={handleDeleteAccount}
+              deleting={deleting}
+            />
           </div>
-        </section>
-      </main>
+        </main>
+      </div>
     </AuthGuard>
   );
 }
