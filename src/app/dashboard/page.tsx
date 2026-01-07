@@ -6,6 +6,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Header } from '@/components/Header';
 import { AuthGuard } from '@/components/AuthGuard';
 
+// 動的レンダリングを強制（認証が必要なページのため）
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'ダッシュボード | Mentra Photo Album',
   description: '最近のアルバムと写真を管理',
