@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Upload, X, Camera, FolderOpen, ArrowLeft } from "lucide-react";
+import { Upload, X, Camera, FolderOpen, ArrowLeft, Image as ImageIcon, Info } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
@@ -12,6 +12,8 @@ import { Switch } from "./ui/switch";
 import { Badge } from "./ui/badge";
 import { Progress } from "./ui/progress";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { getCategoryDefaultImage } from "@/lib/category-images";
 
 interface AlbumCreatorProps {
   onBack: () => void;
@@ -24,6 +26,7 @@ interface AlbumData {
   category: string;
   isPublic: boolean;
   photos: File[];
+  coverImage?: File;
 }
 
 interface PhotoPreview {
@@ -31,6 +34,7 @@ interface PhotoPreview {
   url: string;
   id: string;
 }
+
 
 export function AlbumCreator({ onBack, onSave }: AlbumCreatorProps) {
   const [albumData, setAlbumData] = useState<AlbumData>({
@@ -43,7 +47,9 @@ export function AlbumCreator({ onBack, onSave }: AlbumCreatorProps) {
   const [photos, setPhotos] = useState<PhotoPreview[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [coverImagePreview, setCoverImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const coverImageInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = (files: FileList | null) => {
     if (!files) return;
@@ -93,21 +99,27 @@ export function AlbumCreator({ onBack, onSave }: AlbumCreatorProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (albumData.title && photos.length > 0) {
-      // Simulate upload progress
+    if (albumData.title && albumData.category) {
+      // Simulate upload progress (if photos exist)
+      if (photos.length > 0) {
       let progress = 0;
       const interval = setInterval(() => {
         progress += 10;
         setUploadProgress(progress);
         if (progress >= 100) {
           clearInterval(interval);
+            setUploadProgress(0);
           onSave(albumData);
         }
       }, 200);
+      } else {
+        // No photos, save immediately
+        onSave(albumData);
+      }
     }
   };
 
-  const isFormValid = albumData.title && albumData.category && photos.length > 0;
+  const isFormValid = albumData.title && albumData.category;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
@@ -121,13 +133,13 @@ export function AlbumCreator({ onBack, onSave }: AlbumCreatorProps) {
           <div>
             <h1 className="text-2xl font-medium">新しいアルバムを作成</h1>
             <p className="text-muted-foreground">
-              写真をアップロードしてアルバムを作成しましょう
+              アルバム情報を入力して写真をアップロードしてください
             </p>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Album Information */}
+          {/* アルバム情報 */}
           <Card className="bg-white border shadow-sm">
             <CardHeader>
               <CardTitle>アルバム情報</CardTitle>
@@ -175,10 +187,10 @@ export function AlbumCreator({ onBack, onSave }: AlbumCreatorProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">説明</Label>
+                <Label htmlFor="description">説明（任意）</Label>
                 <Textarea
                   id="description"
-                  placeholder="アルバムの説明を入力してください（任意）"
+                  placeholder="アルバムの説明を入力してください"
                   rows={3}
                   className="bg-white"
                   value={albumData.description}
@@ -188,14 +200,111 @@ export function AlbumCreator({ onBack, onSave }: AlbumCreatorProps) {
                 />
               </div>
 
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="cover-image">アイキャッチ画像（任意）</Label>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
+                      <p>推奨サイズ: 1280×720px（16:9）</p>
+                      <p>最大容量: 5MB</p>
+                      <p>対応形式: JPEG, PNG, GIF</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+                <p className="text-sm text-muted-foreground mb-2">
+                  未設定の場合は{albumData.category ? 'カテゴリに合わせた' : ''}デフォルト画像が使用されます
+                </p>
+                <div className="space-y-4">
+                  <input
+                    ref={coverImageInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setAlbumData({ ...albumData, coverImage: file });
+                        setCoverImagePreview(URL.createObjectURL(file));
+                      }
+                    }}
+                  />
+                  {coverImagePreview ? (
+                    <div className="relative">
+                      <div className="w-full aspect-video rounded-lg overflow-hidden border border-gray-200">
+                        <ImageWithFallback
+                          src={coverImagePreview}
+                          alt="Cover preview"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        className="absolute top-2 right-2 h-8 w-8 p-0 rounded-full"
+                        onClick={() => {
+                          setAlbumData({ ...albumData, coverImage: undefined });
+                          setCoverImagePreview(null);
+                          if (coverImageInputRef.current) {
+                            coverImageInputRef.current.value = '';
+                          }
+                        }}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : albumData.category ? (
+                    <div className="relative">
+                      <div className="w-full aspect-video rounded-lg overflow-hidden border border-gray-200">
+                        <ImageWithFallback
+                          src={getCategoryDefaultImage(albumData.category)}
+                          alt="Default cover preview"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                        <span className="text-sm text-white font-medium">デフォルト画像</span>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => coverImageInputRef.current?.click()}
+                        className="absolute bottom-4 right-4 bg-white"
+                      >
+                        <ImageIcon className="h-4 w-4 mr-2" />
+                        画像を変更
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="w-full aspect-video rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="lg"
+                        onClick={() => coverImageInputRef.current?.click()}
+                        className="gap-2"
+                      >
+                        <ImageIcon className="h-5 w-5" />
+                        画像を選択
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
               <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="space-y-1">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="space-y-1 flex-1">
                     <Label htmlFor="public" className="text-base font-medium">公開設定</Label>
                     <p className="text-sm text-muted-foreground">
                       リンクを知っている人なら誰でも閲覧できます
                     </p>
                   </div>
+                  <div className="flex-shrink-0">
                   <Switch
                     id="public"
                     checked={albumData.isPublic}
@@ -204,29 +313,31 @@ export function AlbumCreator({ onBack, onSave }: AlbumCreatorProps) {
                     }
                   />
                 </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    // 公開設定の詳細設定（将来的にモーダルなどを開く）
-                    alert("公開設定の詳細設定機能は今後実装予定です");
-                  }}
-                  className="w-full"
-                >
-                  設定
-                </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Photo Upload */}
+          {/* 写真アップロード */}
           <Card className="bg-white border shadow-sm">
             <CardHeader>
+                  <div className="flex items-center gap-2">
               <CardTitle className="flex items-center gap-2">
                 <Camera className="h-5 w-5" />
-                写真をアップロード
+                      写真をアップロード（任意）
               </CardTitle>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-xs">
+                        <p>推奨サイズ: 各画像 2000px以下</p>
+                        <p>1枚あたりの最大容量: 10MB</p>
+                        <p>対応形式: JPEG, PNG, GIF</p>
+                        <p>※後からいつでも追加できます</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
               <CardDescription>
                 ドラッグ&ドロップまたはクリックして写真を選択してください
               </CardDescription>
@@ -284,7 +395,7 @@ export function AlbumCreator({ onBack, onSave }: AlbumCreatorProps) {
                     <Badge variant="outline">{photos.length}枚</Badge>
                   </div>
                   
-                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                      <div className="grid grid-cols-3 gap-3">
                     {photos.map((photo) => (
                       <div key={photo.id} className="relative group">
                         <div className="aspect-square relative overflow-hidden rounded-lg bg-gray-100">
@@ -303,9 +414,6 @@ export function AlbumCreator({ onBack, onSave }: AlbumCreatorProps) {
                             <X className="h-3 w-3" />
                           </Button>
                         </div>
-                        <p className="text-xs text-muted-foreground mt-1 truncate">
-                          {photo.file.name}
-                        </p>
                       </div>
                     ))}
                   </div>
