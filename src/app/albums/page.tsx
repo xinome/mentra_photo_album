@@ -5,6 +5,9 @@ import { AlbumsListClient } from '@/components/AlbumsListClient';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Header } from '@/components/Header';
 
+// 動的レンダリングを強制（認証が必要なページのため）
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'アルバム一覧 | Mentra Photo Album',
   description: '全てのアルバムを表示',
