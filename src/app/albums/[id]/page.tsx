@@ -181,7 +181,7 @@ export default function AlbumDetailPage() {
     const token = crypto.randomUUID().replace(/-/g, "");
     const { error } = await supabase
       .from("shares")
-      .insert({ album_id: id, token, permission: "viewer" });
+      .insert({ album_id: id, token, permission: "viewer" } as any);
 
     if (!error) {
       const shareUrl = `${window.location.origin}/share/${token}`;
