@@ -120,7 +120,7 @@ export function AlbumsListClient({ albums }: AlbumsListClientProps) {
           {/* Category Filter */}
           <Select value={categoryFilter} onValueChange={(value) => setCategoryFilter(value as CategoryFilter)}>
             <SelectTrigger className="w-full md:w-[180px]">
-              <Filter className="h-4 w-4 mr-2" />
+              <Filter className="h-4 w-4 mr-2 shrink-0" />
               <SelectValue placeholder="カテゴリ" />
             </SelectTrigger>
             <SelectContent>
@@ -136,7 +136,7 @@ export function AlbumsListClient({ albums }: AlbumsListClientProps) {
           {/* Sort */}
           <Select value={sortOption} onValueChange={(value) => setSortOption(value as SortOption)}>
             <SelectTrigger className="w-full md:w-[180px]">
-              <ArrowUpDown className="h-4 w-4 mr-2" />
+              <ArrowUpDown className="h-4 w-4 mr-2 shrink-0" />
               <SelectValue placeholder="並び替え" />
             </SelectTrigger>
             <SelectContent>
