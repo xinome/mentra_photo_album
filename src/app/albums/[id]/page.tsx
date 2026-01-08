@@ -303,7 +303,12 @@ export default function AlbumDetailPage() {
         setUploadProgress(Math.round(((i + 1) / photos.length) * 100));
       }
 
-      setMessage({ type: 'success', text: `${photos.length}枚の写真を追加しました` });
+      // Snackbarで成功メッセージを表示
+      setSnackbarMessage({
+        type: 'success',
+        title: '写真を追加しました',
+        description: `${photos.length}枚の写真が正常に追加されました`,
+      });
       
       // アルバムデータを再取得
       const fetchAlbumData = async () => {
@@ -357,7 +362,14 @@ export default function AlbumDetailPage() {
       await fetchAlbumData();
     } catch (err: any) {
       console.error("写真アップロードエラー:", err);
-      setMessage({ type: 'error', text: err.message || '写真のアップロードに失敗しました' });
+      const errorMessage = err.message || '写真のアップロードに失敗しました';
+      
+      // Snackbarでエラーメッセージを表示
+      setSnackbarMessage({
+        type: 'error',
+        title: 'アップロードに失敗しました',
+        description: errorMessage,
+      });
     } finally {
       setUploading(false);
       setUploadProgress(0);
@@ -421,7 +433,7 @@ export default function AlbumDetailPage() {
         description: '写真が正常に削除されました',
       });
 
-      setMessage({ type: 'success', text: '写真を削除しました' });
+      // Snackbarで成功メッセージを表示（handlePhotoDelete内でsetSnackbarMessageを使用）
     } catch (err: any) {
       console.error("写真削除エラー:", err);
       const errorMessage = err.message || '写真の削除に失敗しました';
@@ -433,7 +445,7 @@ export default function AlbumDetailPage() {
         description: errorMessage,
       });
       
-      setMessage({ type: 'error', text: errorMessage });
+      // Snackbarでエラーメッセージを表示（handlePhotoDelete内でsetSnackbarMessageを使用）
     } finally {
       setDeleting(false);
     }
@@ -554,28 +566,12 @@ export default function AlbumDetailPage() {
         {/* 写真追加・管理セクション（オーナーのみ） */}
         {isOwner && album && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-            {/* メッセージ表示 */}
-            {message && (
-              <div className={`p-4 rounded-xl shadow-md border-2 ${
-                message.type === 'success' 
-                  ? 'bg-gradient-to-r from-green-50 to-emerald-50 text-green-800 border-green-200 shadow-green-100/50' 
-                  : 'bg-gradient-to-r from-red-50 to-rose-50 text-red-800 border-red-200 shadow-red-100/50'
-              }`}>
-                <div className="flex items-center gap-2">
-                  <div className={`w-2 h-2 rounded-full ${
-                    message.type === 'success' ? 'bg-green-500' : 'bg-red-500'
-                  }`} />
-                  <span className="font-medium">{message.text}</span>
-                </div>
-              </div>
-            )}
-
             <PhotoUploadSection
               onUpload={handlePhotoUpload as (photos: PhotoUploadData[]) => Promise<void>}
               uploading={uploading}
               uploadProgress={uploadProgress}
             />
-            {/* Snackbar表示位置（写真の管理セクションの直前） */}
+            {/* Snackbarはページ最上部に固定表示されます */}
             {snackbarMessage && (
               <PhotoSnackbar
                 message={{
@@ -585,6 +581,19 @@ export default function AlbumDetailPage() {
                   description: snackbarMessage.description,
                 }}
                 onClose={() => setSnackbarMessage(null)}
+                duration={3000}
+              />
+            )}
+            {/* 通常のメッセージもSnackbarで表示 */}
+            {message && (
+              <PhotoSnackbar
+                message={{
+                  id: Date.now().toString(),
+                  type: message.type,
+                  title: message.text,
+                }}
+                onClose={() => setMessage(null)}
+                duration={3000}
               />
             )}
             <PhotoManagementSection

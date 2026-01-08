@@ -93,19 +93,19 @@ export function AlbumsListClient({ albums }: AlbumsListClientProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">アルバム一覧</h1>
-          <p className="text-gray-600">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">アルバム一覧</h1>
+          <p className="text-sm sm:text-base text-gray-600">
             {filteredAndSortedAlbums.length}件のアルバムが見つかりました
           </p>
         </div>
 
         {/* Filters */}
-        <div className="mb-8 space-y-4 md:space-y-0 md:flex md:gap-4">
+        <div className="mb-6 sm:mb-8 space-y-3 sm:space-y-4 md:space-y-0 md:flex md:gap-4">
           {/* Search */}
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -150,21 +150,21 @@ export function AlbumsListClient({ albums }: AlbumsListClientProps) {
 
         {/* Albums Grid */}
         {filteredAndSortedAlbums.length === 0 ? (
-          <Card className="border-0 shadow-lg text-center py-16">
+          <Card className="border-0 shadow-lg text-center py-12 sm:py-16">
             <CardContent>
-              <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Camera className="h-10 w-10 text-gray-400" />
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                <Camera className="h-8 w-8 sm:h-10 sm:w-10 text-gray-400" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">
                 アルバムが見つかりませんでした
               </h3>
-              <p className="text-gray-600 mb-8 text-lg max-w-md mx-auto">
+              <p className="text-sm sm:text-base lg:text-lg text-gray-600 mb-6 sm:mb-8 max-w-md mx-auto px-4">
                 検索条件を変更して、もう一度お試しください。
               </p>
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
             {filteredAndSortedAlbums.map((album) => (
               <Card
                 key={album.id}
@@ -192,21 +192,21 @@ export function AlbumsListClient({ albums }: AlbumsListClientProps) {
                   )}
                 </div>
                 
-                <CardContent className="p-6">
-                  <CardTitle className="text-lg mb-2 line-clamp-1 font-bold">
+                <CardContent className="p-4 sm:p-5 lg:p-6">
+                  <CardTitle className="text-base sm:text-lg mb-2 line-clamp-1 font-bold">
                     {album.title}
                   </CardTitle>
-                  <CardDescription className="line-clamp-2 mb-4 text-gray-600 text-sm">
+                  <CardDescription className="line-clamp-2 mb-3 sm:mb-4 text-gray-600 text-xs sm:text-sm">
                     {album.description}
                   </CardDescription>
-                  <div className="flex items-center justify-between text-sm text-muted-foreground">
-                    <div className="flex items-center gap-2">
-                      <Camera className="h-4 w-4" />
-                      <span className="font-medium">{album.photoCount}枚</span>
+                  <div className="flex items-center justify-between text-xs sm:text-sm text-muted-foreground gap-2">
+                    <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+                      <Camera className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+                      <span className="font-medium truncate">{album.photoCount}枚</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4" />
-                      <span className="font-medium">
+                    <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+                      <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+                      <span className="font-medium truncate text-xs sm:text-sm">
                         {new Date(album.createdAt).toLocaleDateString('ja-JP')}
                       </span>
                     </div>

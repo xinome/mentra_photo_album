@@ -35,13 +35,14 @@ export function Header({ user, onLogout }: HeaderProps) {
   return (
     <header className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          <Link href="/dashboard" className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
-              <Camera className="h-6 w-6 text-white" />
+        <div className="flex justify-between items-center h-14 sm:h-16">
+          <Link href="/dashboard" className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1 sm:flex-initial">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shrink-0">
+              <Camera className="h-4 w-4 sm:h-6 sm:w-6 text-white" />
             </div>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Mentra Photo Album
+            <h1 className="text-base sm:text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent truncate">
+              <span className="hidden sm:inline">Mentra Photo Album</span>
+              <span className="sm:hidden">Mentra</span>
             </h1>
           </Link>
 
