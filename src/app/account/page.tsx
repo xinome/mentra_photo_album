@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
+import { Snackbar } from "@/components/ui/snackbar";
 import { ProfileSection } from "./components/ProfileSection";
 import { SecuritySection } from "./components/SecuritySection";
 import { AccountManagementSection } from "./components/AccountManagementSection";
@@ -376,20 +377,16 @@ export default function AccountPage() {
             </Button>
           </div>
 
-          {/* メッセージ表示 */}
+          {/* Snackbarはページ最上部に固定表示されます */}
           {message && (
-            <div className={`p-4 rounded-xl shadow-md border-2 ${
-              message.type === 'success' 
-                ? 'bg-gradient-to-r from-green-50 to-emerald-50 text-green-800 border-green-200 shadow-green-100/50' 
-                : 'bg-gradient-to-r from-red-50 to-rose-50 text-red-800 border-red-200 shadow-red-100/50'
-            }`}>
-              <div className="flex items-center gap-2">
-                <div className={`w-2 h-2 rounded-full ${
-                  message.type === 'success' ? 'bg-green-500' : 'bg-red-500'
-                }`} />
-                <span className="font-medium">{message.text}</span>
-              </div>
-            </div>
+            <Snackbar
+              message={{
+                type: message.type,
+                title: message.text,
+              }}
+              onClose={() => setMessage(null)}
+              duration={3000}
+            />
           )}
 
           {/* セクション */}

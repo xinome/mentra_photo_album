@@ -87,62 +87,62 @@ export function AlbumViewer({ album, onBack, onShare, onDownload, onLikePhoto, o
       {/* Header */}
       <div className="bg-white border-b sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" onClick={onBack} className="gap-2">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 py-3 sm:py-0 sm:h-16">
+            <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
+              <Button variant="ghost" onClick={onBack} className="gap-2 shrink-0">
                 <ArrowLeft className="h-4 w-4" />
-                戻る
+                <span className="hidden sm:inline">戻る</span>
               </Button>
-              <div>
-                <h1 className="text-xl font-medium">{album.title}</h1>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Badge variant="outline">{categoryLabels[album.category]}</Badge>
-                  <span>•</span>
-                  <span>{album.photos.length}枚の写真</span>
+              <div className="min-w-0 flex-1">
+                <h1 className="text-lg sm:text-xl font-medium truncate">{album.title}</h1>
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground flex-wrap">
+                  <Badge variant="outline" className="text-xs">{categoryLabels[album.category]}</Badge>
+                  <span className="hidden sm:inline">•</span>
+                  <span className="whitespace-nowrap">{album.photos.length}枚の写真</span>
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 w-full sm:w-auto">
               {canEdit && onEdit && (
-                <Button variant="outline" onClick={onEdit} className="gap-2">
-                  <Edit className="h-4 w-4" />
-                  編集
+                <Button variant="outline" onClick={onEdit} size="sm" className="gap-1.5 sm:gap-2 flex-1 sm:flex-initial">
+                  <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <span className="text-xs sm:text-sm">編集</span>
                 </Button>
               )}
-              <Button variant="outline" onClick={onShare} className="gap-2">
-                <Share2 className="h-4 w-4" />
-                共有
+              <Button variant="outline" onClick={onShare} size="sm" className="gap-1.5 sm:gap-2 flex-1 sm:flex-initial">
+                <Share2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span className="text-xs sm:text-sm">共有</span>
               </Button>
-              <Button variant="outline" onClick={onDownload} className="gap-2">
-                <Download className="h-4 w-4" />
-                ダウンロード
+              <Button variant="outline" onClick={onDownload} size="sm" className="gap-1.5 sm:gap-2 flex-1 sm:flex-initial">
+                <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">ダウンロード</span>
               </Button>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
         {/* Album Info */}
-        <Card className="mb-8">
-          <CardContent className="p-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 space-y-4">
+        <Card className="mb-6 sm:mb-8">
+          <CardContent className="p-4 sm:p-5 lg:p-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
+              <div className="lg:col-span-2 space-y-3 sm:space-y-4">
                 <div>
-                  <p className="text-muted-foreground mb-2">{album.description}</p>
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <Calendar className="h-4 w-4" />
-                      {new Date(album.createdAt).toLocaleDateString('ja-JP')}
+                  <p className="text-sm sm:text-base text-muted-foreground mb-2 sm:mb-3">{album.description}</p>
+                  <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
+                    <div className="flex items-center gap-1.5">
+                      <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                      <span>{new Date(album.createdAt).toLocaleDateString('ja-JP')}</span>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <Camera className="h-4 w-4" />
-                      {album.photos.length}枚
+                    <div className="flex items-center gap-1.5">
+                      <Camera className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                      <span>{album.photos.length}枚</span>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <Users className="h-4 w-4" />
-                      {album.contributors.length}人が参加
+                    <div className="flex items-center gap-1.5">
+                      <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                      <span>{album.contributors.length}人が参加</span>
                     </div>
                   </div>
                 </div>
@@ -185,10 +185,10 @@ export function AlbumViewer({ album, onBack, onShare, onDownload, onLikePhoto, o
         </Card>
 
         {/* Filters and Controls */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="flex-1">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-4 sm:mb-6">
+          <div className="flex-1 min-w-0">
             <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="写真や投稿者を検索..."
                 className="pl-10"
@@ -200,8 +200,8 @@ export function AlbumViewer({ album, onBack, onShare, onDownload, onLikePhoto, o
 
           <div className="flex items-center gap-2">
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-40">
-                <Filter className="h-4 w-4 mr-2" />
+              <SelectTrigger className="w-full sm:w-[140px] md:w-40">
+                <Filter className="h-4 w-4 mr-2 shrink-0" />
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -211,22 +211,22 @@ export function AlbumViewer({ album, onBack, onShare, onDownload, onLikePhoto, o
               </SelectContent>
             </Select>
 
-            <div className="flex border rounded-md">
+            <div className="flex border rounded-md shrink-0">
               <Button
                 variant={viewMode === "grid" ? "default" : "ghost"}
                 size="sm"
                 onClick={() => setViewMode("grid")}
-                className="rounded-r-none"
+                className="rounded-r-none px-2 sm:px-3"
               >
-                <Grid className="h-4 w-4" />
+                <Grid className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </Button>
               <Button
                 variant={viewMode === "list" ? "default" : "ghost"}
                 size="sm"
                 onClick={() => setViewMode("list")}
-                className="rounded-l-none"
+                className="rounded-l-none px-2 sm:px-3"
               >
-                <List className="h-4 w-4" />
+                <List className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </Button>
             </div>
           </div>
@@ -248,8 +248,8 @@ export function AlbumViewer({ album, onBack, onShare, onDownload, onLikePhoto, o
         ) : (
           <div className={
             viewMode === "grid"
-              ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
-              : "space-y-4"
+              ? "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4"
+              : "space-y-3 sm:space-y-4"
           }>
             {filteredPhotos.map((photo) => (
               <div key={photo.id}>

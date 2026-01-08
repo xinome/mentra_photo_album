@@ -120,77 +120,80 @@ export function PhotoManagementSection({
               onDragStart={() => handleDragStart(photo.id)}
               onDragOver={handleDragOver}
               onDrop={(e) => handleDrop(e, photo.id)}
-              className={`flex items-center gap-4 p-3 rounded-lg border-2 transition-all ${
+              className={`flex flex-col lg:flex-row lg:items-center gap-3 p-4 rounded-lg border-2 transition-all ${
                 draggedPhotoId === photo.id
                   ? "border-blue-500 bg-blue-50 opacity-50"
                   : "border-gray-200 hover:border-gray-300 bg-white"
               }`}
             >
-              {/* ドラッグハンドル */}
-              {onReorder && (
-                <div className="cursor-move text-gray-400 hover:text-gray-600">
-                  <GripVertical className="h-5 w-5" />
-                </div>
-              )}
-
-              {/* サムネイル */}
-              <div className="w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
-                <img
-                  src={photo.thumbnail}
-                  alt={photo.title || "Photo"}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-
-              {/* 写真情報 */}
-              <div className="flex-1 min-w-0">
-                {editingPhotoId === photo.id ? (
-                  <div className="flex items-center gap-2">
-                    <Input
-                      value={editCaption}
-                      onChange={(e) => setEditCaption(e.target.value)}
-                      placeholder="キャプションを入力..."
-                      className="flex-1"
-                      autoFocus
-                    />
-                    <Button
-                      size="sm"
-                      onClick={() => handleSaveEdit(photo.id)}
-                      disabled={updating}
-                      className="bg-green-600 hover:bg-green-700 text-white"
-                    >
-                      <Save className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={handleCancelEdit}
-                      disabled={updating}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ) : (
-                  <div>
-                    <p className="text-sm font-medium text-gray-900 truncate">
-                      {photo.title || "（キャプションなし）"}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {new Date(photo.uploadedAt).toLocaleDateString("ja-JP")}
-                    </p>
+              {/* 上段（SP/タブレット）・左側（PC）：サムネイルと写真情報 */}
+              <div className="flex items-center gap-4 flex-1 min-w-0">
+                {/* ドラッグハンドル */}
+                {onReorder && (
+                  <div className="cursor-move text-gray-400 hover:text-gray-600">
+                    <GripVertical className="h-5 w-5" />
                   </div>
                 )}
+
+                {/* サムネイル */}
+                <div className="w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
+                  <img
+                    src={photo.thumbnail}
+                    alt={photo.title || "Photo"}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+
+                {/* 写真情報 */}
+                <div className="flex-1 min-w-0">
+                  {editingPhotoId === photo.id ? (
+                    <div className="flex items-center gap-2">
+                      <Input
+                        value={editCaption}
+                        onChange={(e) => setEditCaption(e.target.value)}
+                        placeholder="キャプションを入力..."
+                        className="flex-1"
+                        autoFocus
+                      />
+                      <Button
+                        size="default"
+                        onClick={() => handleSaveEdit(photo.id)}
+                        disabled={updating}
+                        className="bg-green-600 hover:bg-green-700 text-white"
+                      >
+                        <Save className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        size="default"
+                        variant="outline"
+                        onClick={handleCancelEdit}
+                        disabled={updating}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div>
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {photo.title || "（キャプションなし）"}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {new Date(photo.uploadedAt).toLocaleDateString("ja-JP")}
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
 
-              {/* アクションボタン */}
+              {/* 下段（SP/タブレット）・右側（PC）：アクションボタン */}
               {editingPhotoId !== photo.id && (
-                <div className="flex items-center gap-2 flex-shrink-0">
+                <div className="flex items-center justify-end gap-2 lg:justify-end lg:flex-shrink-0 pl-0 sm:pl-[calc(1.5rem+64px)] lg:pl-0">
                   <Button
-                    size="sm"
+                    size="default"
                     variant="outline"
                     onClick={() => handleStartEdit(photo)}
                     disabled={updating}
-                    className="gap-2 min-w-[80px]"
+                    className="gap-2 px-4"
                   >
                     <Edit2 className="h-4 w-4" />
                     編集
@@ -198,10 +201,10 @@ export function PhotoManagementSection({
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button
-                        size="sm"
+                        size="default"
                         variant="destructive"
                         disabled={deleting}
-                        className="gap-2 min-w-[80px] bg-red-600 hover:bg-red-700 text-white border-red-600"
+                        className="gap-2 px-4 bg-red-600 hover:bg-red-700 text-white border-red-600"
                       >
                         <Trash2 className="h-4 w-4" />
                         削除
