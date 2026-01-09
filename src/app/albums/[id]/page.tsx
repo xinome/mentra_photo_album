@@ -30,6 +30,7 @@ interface Photo {
   uploadedAt: string;
   likes: number;
   isLiked: boolean;
+  uploaderId?: string; // 追加：投稿者ID
 }
 
 interface Album {
@@ -59,6 +60,7 @@ export default function AlbumDetailPage() {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [deleting, setDeleting] = useState(false);
+  const [deletingAlbum, setDeletingAlbum] = useState(false); // 追加：アルバム削除中フラグ
   const [updating, setUpdating] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [snackbarMessage, setSnackbarMessage] = useState<{ type: 'success' | 'error', title: string, description?: string } | null>(null);
@@ -87,7 +89,7 @@ export default function AlbumDetailPage() {
       // 写真を取得
       const { data: photosData, error: photosError } = await supabase
         .from("photos")
-        .select("id,storage_key,caption,exif,created_at")
+        .select("id,storage_key,caption,exif,created_at,uploader_id") // uploader_idを追加
         .eq("album_id", id)
         .order("created_at");
 
@@ -120,6 +122,7 @@ export default function AlbumDetailPage() {
             uploadedAt: photo.created_at,
             likes: 0,
             isLiked: false,
+            uploaderId: (photoData as any).uploader_id, // 追加
           };
         })
       );
@@ -214,6 +217,78 @@ export default function AlbumDetailPage() {
 
   const handleEdit = () => {
     router.push(`/albums/${id}/edit`);
+  };
+
+  // アルバム削除機能
+  const handleAlbumDelete = async () => {
+    if (!user || !id) return;
+
+    setDeletingAlbum(true);
+    setMessage(null);
+
+    try {
+      // 権限チェック：作成者本人のみ削除可能
+      if (!isOwner) {
+        throw new Error("このアルバムを削除する権限がありません");
+      }
+
+      // アルバムに紐づく写真を取得
+      const { data: photos } = await supabase
+        .from('photos')
+        .select('storage_key')
+        .eq('album_id', id);
+
+      // ストレージから写真を削除
+      if (photos && photos.length > 0) {
+        const storageKeys = photos
+          .map((p: any) => p.storage_key)
+          .filter((key: string) => !key.startsWith('http'));
+
+        if (storageKeys.length > 0) {
+          const { error: storageError } = await supabase.storage
+            .from('photos')
+            .remove(storageKeys);
+
+          if (storageError) {
+            console.warn('ストレージ削除エラー（無視）:', storageError);
+          }
+        }
+      }
+
+      // アルバムを削除（カスケード削除で写真も削除される）
+      const { error } = await supabase
+        .from('albums')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        throw new Error('アルバムの削除に失敗しました');
+      }
+
+      // Snackbarで成功メッセージを表示
+      setSnackbarMessage({
+        type: 'success',
+        title: 'アルバムを削除しました',
+        description: 'アルバムが正常に削除されました',
+      });
+
+      // アルバム一覧ページにリダイレクト
+      setTimeout(() => {
+        router.push('/albums');
+      }, 1000);
+    } catch (err: any) {
+      console.error("アルバム削除エラー:", err);
+      const errorMessage = err.message || 'アルバムの削除に失敗しました';
+      
+      // Snackbarでエラーメッセージを表示
+      setSnackbarMessage({
+        type: 'error',
+        title: '削除に失敗しました',
+        description: errorMessage,
+      });
+    } finally {
+      setDeletingAlbum(false);
+    }
   };
 
   // 写真追加機能
@@ -314,7 +389,7 @@ export default function AlbumDetailPage() {
       const fetchAlbumData = async () => {
         const { data: photosData } = await supabase
           .from("photos")
-          .select("id,storage_key,caption,exif,created_at")
+          .select("id,storage_key,caption,exif,created_at,uploader_id") // uploader_idを追加
           .eq("album_id", id)
           .order("created_at");
 
@@ -347,6 +422,7 @@ export default function AlbumDetailPage() {
               uploadedAt: photo.created_at,
               likes: 0,
               isLiked: false,
+              uploaderId: photoData.uploader_id, // 追加
             };
           })
         );
@@ -384,10 +460,10 @@ export default function AlbumDetailPage() {
     setMessage(null);
 
     try {
-      // 写真情報を取得
+      // 写真情報を取得（uploader_idを含む）
       const { data: photoData } = await supabase
         .from("photos")
-        .select("storage_key")
+        .select("storage_key,uploader_id") // uploader_idを追加
         .eq("id", photoId)
         .single();
 
@@ -395,7 +471,13 @@ export default function AlbumDetailPage() {
         throw new Error("写真が見つかりません");
       }
 
-      const storageKey = (photoData as any).storage_key;
+      // 権限チェック：投稿者本人のみ削除可能
+      const photo = photoData as any;
+      if (photo.uploader_id !== user.id) {
+        throw new Error("この写真を削除する権限がありません");
+      }
+
+      const storageKey = photo.storage_key;
 
       // Storageから削除（URLの場合はスキップ）
       if (storageKey && !storageKey.startsWith('http')) {
@@ -561,6 +643,9 @@ export default function AlbumDetailPage() {
           onLikePhoto={handleLikePhoto}
           onEdit={handleEdit}
           canEdit={isOwner}
+          onDelete={handleAlbumDelete}
+          canDelete={isOwner}
+          deleting={deletingAlbum}
         />
 
         {/* 写真追加・管理セクション（オーナーのみ） */}
@@ -603,12 +688,14 @@ export default function AlbumDetailPage() {
                 thumbnail: p.thumbnail,
                 title: p.title,
                 uploadedAt: p.uploadedAt,
+                uploaderId: p.uploaderId, // 追加
               }))}
               onDelete={handlePhotoDelete}
               onUpdateCaption={handlePhotoCaptionUpdate}
               onReorder={handlePhotoReorder}
               deleting={deleting}
               updating={updating}
+              currentUserId={user?.id} // 追加
             />
           </div>
         )}

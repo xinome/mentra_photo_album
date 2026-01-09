@@ -23,6 +23,7 @@ interface Photo {
   thumbnail: string;
   title?: string;
   uploadedAt: string;
+  uploaderId?: string; // 追加：投稿者ID
 }
 
 interface PhotoManagementSectionProps {
@@ -32,6 +33,7 @@ interface PhotoManagementSectionProps {
   onReorder?: (photoIds: string[]) => Promise<void>;
   deleting?: boolean;
   updating?: boolean;
+  currentUserId?: string; // 追加：現在のユーザーID
 }
 
 export function PhotoManagementSection({
@@ -41,6 +43,7 @@ export function PhotoManagementSection({
   onReorder,
   deleting = false,
   updating = false,
+  currentUserId, // 追加
 }: PhotoManagementSectionProps) {
   const [editingPhotoId, setEditingPhotoId] = useState<string | null>(null);
   const [editCaption, setEditCaption] = useState("");
@@ -113,19 +116,23 @@ export function PhotoManagementSection({
           </div>
         ) : (
           <div className="space-y-3">
-            {photos.map((photo, index) => (
-            <div
-              key={photo.id}
-              draggable={!!onReorder}
-              onDragStart={() => handleDragStart(photo.id)}
-              onDragOver={handleDragOver}
-              onDrop={(e) => handleDrop(e, photo.id)}
-              className={`flex flex-col lg:flex-row lg:items-center gap-3 p-4 rounded-lg border-2 transition-all ${
-                draggedPhotoId === photo.id
-                  ? "border-blue-500 bg-blue-50 opacity-50"
-                  : "border-gray-200 hover:border-gray-300 bg-white"
-              }`}
-            >
+            {photos.map((photo, index) => {
+              // 削除可能かどうかを判定
+              const canDelete = currentUserId && photo.uploaderId === currentUserId;
+              
+              return (
+                <div
+                  key={photo.id}
+                  draggable={!!onReorder}
+                  onDragStart={() => handleDragStart(photo.id)}
+                  onDragOver={handleDragOver}
+                  onDrop={(e) => handleDrop(e, photo.id)}
+                  className={`flex flex-col lg:flex-row lg:items-center gap-3 p-4 rounded-lg border-2 transition-all ${
+                    draggedPhotoId === photo.id
+                      ? "border-blue-500 bg-blue-50 opacity-50"
+                      : "border-gray-200 hover:border-gray-300 bg-white"
+                  }`}
+                >
               {/* 上段（SP/タブレット）・左側（PC）：サムネイルと写真情報 */}
               <div className="flex items-center gap-4 flex-1 min-w-0">
                 {/* ドラッグハンドル */}
@@ -198,40 +205,44 @@ export function PhotoManagementSection({
                     <Edit2 className="h-4 w-4" />
                     編集
                   </Button>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        size="default"
-                        variant="destructive"
-                        disabled={deleting}
-                        className="gap-2 px-4 bg-red-600 hover:bg-red-700 text-white border-red-600"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                        削除
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>写真を削除しますか？</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          この操作は取り消すことができません。写真が完全に削除されます。
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>キャンセル</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => onDelete(photo.id)}
-                          className="bg-red-600 hover:bg-red-700 text-white"
+                  {/* 削除ボタンは投稿者本人のみ表示 */}
+                  {canDelete && (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          size="default"
+                          variant="destructive"
+                          disabled={deleting}
+                          className="gap-2 px-4 bg-red-600 hover:bg-red-700 text-white border-red-600"
                         >
+                          <Trash2 className="h-4 w-4" />
                           削除
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>写真を削除しますか？</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            この操作は取り消すことができません。写真が完全に削除されます。
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>キャンセル</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => onDelete(photo.id)}
+                            className="bg-red-600 hover:bg-red-700 text-white"
+                          >
+                            削除
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
                 </div>
               )}
-            </div>
-          ))}
+                </div>
+              );
+            })}
           </div>
         )}
       </CardContent>
