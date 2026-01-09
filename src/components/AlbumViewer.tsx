@@ -1,13 +1,24 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft, Download, Share2, Heart, Calendar, Users, Camera, Grid, List, Search, Filter, Edit } from "lucide-react";
+import { ArrowLeft, Download, Share2, Heart, Calendar, Users, Camera, Grid, List, Search, Filter, Edit, Trash2 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "./ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 
@@ -48,6 +59,9 @@ interface AlbumViewerProps {
   onLikePhoto: (photoId: string) => void;
   onEdit?: () => void;
   canEdit?: boolean;
+  onDelete?: () => void; // 追加：削除ハンドラ
+  canDelete?: boolean; // 追加：削除可能かどうか
+  deleting?: boolean; // 追加：削除中かどうか
 }
 
 const categoryLabels = {
@@ -58,7 +72,7 @@ const categoryLabels = {
   other: "その他",
 };
 
-export function AlbumViewer({ album, onBack, onShare, onDownload, onLikePhoto, onEdit, canEdit }: AlbumViewerProps) {
+export function AlbumViewer({ album, onBack, onShare, onDownload, onLikePhoto, onEdit, canEdit, onDelete, canDelete, deleting }: AlbumViewerProps) {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("newest");
@@ -118,6 +132,40 @@ export function AlbumViewer({ album, onBack, onShare, onDownload, onLikePhoto, o
                 <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 <span className="hidden sm:inline">ダウンロード</span>
               </Button>
+              {/* 削除ボタン（作成者本人のみ表示） */}
+              {canDelete && onDelete && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="gap-1.5 sm:gap-2 flex-1 sm:flex-initial text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                      disabled={deleting}
+                    >
+                      <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                      <span className="text-xs sm:text-sm">削除</span>
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>アルバムを削除しますか？</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        この操作は取り消すことができません。アルバムとすべての写真が完全に削除されます。
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>キャンセル</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={onDelete}
+                        className="bg-red-600 hover:bg-red-700 text-white"
+                        disabled={deleting}
+                      >
+                        {deleting ? "削除中..." : "削除"}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
             </div>
           </div>
         </div>
