@@ -12,7 +12,7 @@
 
 - サンプルデータの写真は、**Unsplashの画像URL**を`storage_key`として直接保存しています
 - これは、実際のファイルをアップロードせずにサンプルデータを表示するための仕様です
-- 詳細は `docs/SAMPLE_ALBUM_IMAGE_SOURCE.md` を参照
+- 詳細は `docs/data/SAMPLE_ALBUM_IMAGE_SOURCE.md` を参照
 
 **つまり、「photosバケットの中に入ってきていない」のは正常な動作です。**
 
