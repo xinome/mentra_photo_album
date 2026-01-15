@@ -49,6 +49,13 @@ export function AlbumEditor({ albumId, initialData, onBack, onSave }: AlbumEdito
   const [removeCoverImage, setRemoveCoverImage] = useState(false);
   const coverImageInputRef = useRef<HTMLInputElement>(null);
 
+  // initialData.coverImageUrlが変更された場合にcoverImagePreviewを更新
+  useEffect(() => {
+    if (initialData.coverImageUrl && !newCoverImage && !removeCoverImage) {
+      setCoverImagePreview(initialData.coverImageUrl);
+    }
+  }, [initialData.coverImageUrl, newCoverImage, removeCoverImage]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (albumData.title && albumData.category) {
@@ -89,8 +96,9 @@ export function AlbumEditor({ albumId, initialData, onBack, onSave }: AlbumEdito
   const isFormValid = albumData.title && albumData.category;
 
   // 表示するカバー画像を決定
+  // 優先順位: 1. 新しいカバー画像のプレビュー 2. 既存のカバー画像 3. デフォルト画像（削除されていない場合のみ）
   const displayCoverImage = coverImagePreview || 
-    (albumData.category && !removeCoverImage ? getCategoryDefaultImage(albumData.category) : null);
+    (!removeCoverImage && albumData.category ? getCategoryDefaultImage(albumData.category) : null);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">

@@ -62,26 +62,36 @@ export default function AlbumEditPage() {
       // カバー画像のURLを取得
       let coverImageUrl: string | undefined;
       if (album.cover_photo_id) {
-        const { data: coverPhoto } = await supabase
+        const { data: coverPhoto, error: coverPhotoError } = await supabase
           .from("photos")
           .select("storage_key")
           .eq("id", album.cover_photo_id)
           .single();
 
-        if (coverPhoto && (coverPhoto as any).storage_key) {
+        if (coverPhotoError) {
+          console.error("カバー画像取得エラー:", coverPhotoError);
+          // エラーが発生した場合はcoverImageUrlをundefinedのままにする
+        } else if (coverPhoto && (coverPhoto as any).storage_key) {
           const storageKey = (coverPhoto as any).storage_key;
           if (storageKey.startsWith('http')) {
             coverImageUrl = storageKey;
           } else {
-            const { data: signedUrl } = await supabase.storage
+            const { data: signedUrl, error: signedUrlError } = await supabase.storage
               .from("photos")
               .createSignedUrl(storageKey, 3600);
-            coverImageUrl = signedUrl?.signedUrl;
+            
+            if (signedUrlError) {
+              console.error("署名付きURL取得エラー:", signedUrlError);
+              // エラーが発生した場合はcoverImageUrlをundefinedのままにする
+            } else {
+              coverImageUrl = signedUrl?.signedUrl;
+            }
           }
         }
       }
 
-      // カバー画像がない場合はカテゴリのデフォルト画像を使用
+      // カバー画像がない場合のみカテゴリのデフォルト画像を使用
+      // 既存のカバー画像が正しく取得できている場合は、デフォルト画像に上書きしない
       if (!coverImageUrl && album.category) {
         coverImageUrl = getCategoryDefaultImage(album.category);
       }
@@ -117,7 +127,8 @@ export default function AlbumEditPage() {
       } else if (updateData.coverImage) {
         // 新しいカバー画像をアップロード
         const fileExt = updateData.coverImage.name.split('.').pop();
-        const fileName = `${albumId}/cover_${Date.now()}.${fileExt}`;
+        const randomSuffix = Math.random().toString(36).substring(2, 9);
+        const fileName = `${user.id}/${albumId}/cover_${Date.now()}-${randomSuffix}.${fileExt}`;
 
         const { error: uploadError, data: uploadData } = await supabase.storage
           .from("photos")
@@ -128,14 +139,16 @@ export default function AlbumEditPage() {
 
         if (uploadError) {
           console.error("画像アップロードエラー:", uploadError);
-          alert("画像のアップロードに失敗しました");
+          alert(`画像のアップロードに失敗しました: ${uploadError.message}`);
           setSaving(false);
           return;
         }
 
         // 既存のカバー画像を削除（あれば）
+        // 既存のcover_photo_idを取得して、その写真レコードを削除する
         if (album.coverImageUrl && !album.coverImageUrl.startsWith('http')) {
           // 既存のカバー画像を削除する処理（必要に応じて実装）
+          // 注意: 既存のカバー画像のstorage_keyを削除する必要がある場合は、ここで実装
         }
 
         // 写真レコードを作成
@@ -143,7 +156,10 @@ export default function AlbumEditPage() {
           .from("photos")
           .insert({
             album_id: albumId,
+            uploader_id: user.id,
             storage_key: fileName,
+            mime_type: updateData.coverImage.type,
+            bytes: updateData.coverImage.size,
             caption: "カバー画像",
           } as any)
           .select()
@@ -151,7 +167,9 @@ export default function AlbumEditPage() {
 
         if (photoError) {
           console.error("写真レコード作成エラー:", photoError);
-          alert("画像の保存に失敗しました");
+          // アップロードしたファイルを削除
+          await supabase.storage.from("photos").remove([fileName]);
+          alert(`画像の保存に失敗しました: ${photoError.message}`);
           setSaving(false);
           return;
         }
@@ -159,13 +177,21 @@ export default function AlbumEditPage() {
         coverPhotoId = photoData ? (photoData as any).id : null;
       } else {
         // カバー画像は変更なし（既存のものを維持）
-        const { data: existingAlbum } = await supabase
+        // エラーハンドリングを改善
+        const { data: existingAlbum, error: existingAlbumError } = await supabase
           .from("albums")
           .select("cover_photo_id")
           .eq("id", albumId)
           .single();
 
-        coverPhotoId = existingAlbum ? (existingAlbum as any).cover_photo_id || null : null;
+        if (existingAlbumError) {
+          console.error("既存アルバム取得エラー:", existingAlbumError);
+          // エラーが発生した場合はnullを使用（安全なフォールバック）
+          // アルバムデータが正しく取得できている場合でも、エラーが発生した場合はnullを使用
+          coverPhotoId = null;
+        } else {
+          coverPhotoId = existingAlbum ? (existingAlbum as any).cover_photo_id || null : null;
+        }
       }
 
       // アルバム情報を更新
@@ -183,16 +209,16 @@ export default function AlbumEditPage() {
 
       if (updateError) {
         console.error("アルバム更新エラー:", updateError);
-        alert("アルバムの更新に失敗しました");
+        alert(`アルバムの更新に失敗しました: ${updateError.message}`);
         setSaving(false);
         return;
       }
 
-      // 編集画面から詳細画面に戻る
-      router.push(`/albums/${albumId}`);
-    } catch (error) {
+      // 編集画面から詳細画面に戻る（成功メッセージ用のパラメータを付与）
+      router.push(`/albums/${albumId}?updated=true`);
+    } catch (error: any) {
       console.error("エラー:", error);
-      alert("エラーが発生しました");
+      alert(`エラーが発生しました: ${error.message || '不明なエラー'}`);
       setSaving(false);
     }
   };
