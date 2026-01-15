@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { AlbumViewer } from "@/components/AlbumViewer";
@@ -51,6 +51,7 @@ interface Album {
 export default function AlbumDetailPage() {
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const { user } = useAuth();
   const id = params.id as string;
   
@@ -64,6 +65,24 @@ export default function AlbumDetailPage() {
   const [updating, setUpdating] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [snackbarMessage, setSnackbarMessage] = useState<{ type: 'success' | 'error', title: string, description?: string } | null>(null);
+
+  // URLパラメータを確認して編集完了メッセージを表示
+  useEffect(() => {
+    const updated = searchParams.get('updated');
+    if (updated === 'true') {
+      // 編集完了メッセージを表示
+      setSnackbarMessage({
+        type: 'success',
+        title: '変更しました',
+        description: 'アルバムの情報を正常に更新しました',
+      });
+      
+      // URLパラメータを削除（リロード時に再度表示されないようにする）
+      const url = new URL(window.location.href);
+      url.searchParams.delete('updated');
+      router.replace(url.pathname + url.search, { scroll: false });
+    }
+  }, [searchParams, router]);
 
   useEffect(() => {
     const fetchAlbumData = async () => {
@@ -86,7 +105,7 @@ export default function AlbumDetailPage() {
       const album = albumData as any;
       setIsOwner(album.owner_id === user?.id);
 
-      // 写真を取得
+      // 写真を取得（アイキャッチ画像を除外）
       const { data: photosData, error: photosError } = await supabase
         .from("photos")
         .select("id,storage_key,caption,exif,created_at,uploader_id") // uploader_idを追加
@@ -95,9 +114,14 @@ export default function AlbumDetailPage() {
 
       console.log("写真取得結果:", { photosData, photosError });
 
+      // アイキャッチ画像（cover_photo_id）を除外
+      const filteredPhotosData = (photosData || []).filter(
+        (photo: DbPhoto) => photo.id !== album.cover_photo_id
+      );
+
       // 各写真のURLを取得
       const photos: Photo[] = await Promise.all(
-        (photosData || []).map(async (photo: DbPhoto) => {
+        filteredPhotosData.map(async (photo: DbPhoto) => {
           let photoUrl = "";
           const photoData = photo as any;
           
@@ -387,14 +411,27 @@ export default function AlbumDetailPage() {
       
       // アルバムデータを再取得
       const fetchAlbumData = async () => {
+        // アルバム情報を再取得してcover_photo_idを取得
+        const { data: albumData } = await supabase
+          .from("albums")
+          .select("cover_photo_id")
+          .eq("id", id)
+          .single();
+
         const { data: photosData } = await supabase
           .from("photos")
           .select("id,storage_key,caption,exif,created_at,uploader_id") // uploader_idを追加
           .eq("album_id", id)
           .order("created_at");
 
+        // アイキャッチ画像（cover_photo_id）を除外
+        const coverPhotoId = (albumData as any)?.cover_photo_id;
+        const filteredPhotosData = (photosData || []).filter(
+          (photo: DbPhoto) => photo.id !== coverPhotoId
+        );
+
         const photos: Photo[] = await Promise.all(
-          (photosData || []).map(async (photo: DbPhoto) => {
+          filteredPhotosData.map(async (photo: DbPhoto) => {
             let photoUrl = "";
             const photoData = photo as any;
             
