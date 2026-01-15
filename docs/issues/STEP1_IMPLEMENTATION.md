@@ -1,3 +1,5 @@
+# Step 1 実装完了: ダッシュボードとアルバム一覧の分離
+
 ## 📝 概要
 
 Figma Makeからの引き継ぎに基づき、Step 1の実装を完了しました。
@@ -76,9 +78,9 @@ Figma Makeからの引き継ぎに基づき、Step 1の実装を完了しまし�
 
 ### ドキュメント
 
-* `docs/DEVELOPMENT_GUIDE.md` - Figma Make連携の引き継ぎ方法を追加
-* `docs/GITHUB_ISSUE_TEMPLATE.md` - Issue作成テンプレート（新規）
-* `docs/GITHUB_ISSUE_STEP1_IMPLEMENTATION.md` - 実装詳細ドキュメント（新規）
+* `docs/project/DEVELOPMENT_GUIDE.md` - Figma Make連携の引き継ぎ方法を追加
+* `docs/issues/TEMPLATE.md` - Issue作成テンプレート（新規）
+* `docs/issues/STEP1_IMPLEMENTATION.md` - このIssue（新規）
 
 ## ✅ 検証項目
 

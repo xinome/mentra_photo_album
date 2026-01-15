@@ -92,7 +92,7 @@
 
 ### ドキュメント
 
-* `docs/GITHUB_ISSUE_ALBUM_CREATOR_IMPROVEMENT.md` - このIssue（新規）
+* `docs/issues/ALBUM_CREATOR_IMPROVEMENT.md` - このIssue（新規）
 
 ## ✅ 検証項目
 

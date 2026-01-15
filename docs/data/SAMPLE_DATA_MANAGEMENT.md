@@ -13,10 +13,10 @@
 - サンプルデータの写真は、**Unsplashの画像URL**を`storage_key`として直接保存しています
 - これは、実際のファイルをアップロードせずにサンプルデータを表示するための仕様です
 - **「photosバケットの中に入ってきていない」のは正常な動作です**
-- 詳細は `docs/SAMPLE_ALBUM_IMAGE_SOURCE.md` を参照
+- 詳細は `docs/data/SAMPLE_ALBUM_IMAGE_SOURCE.md` を参照
 
 **写真を実際にStorageに保存したい場合**:
-- `docs/PHOTO_STORAGE_MIGRATION.md` を参照してください
+- `docs/data/PHOTO_STORAGE_MIGRATION.md` を参照してください
 - SQLだけでは画像をStorageに保存することはできません
 - アプリケーション側で実装する必要があります
 
@@ -24,7 +24,7 @@
 
 SQLスクリプトを実行した後、データが正しく作成されたか確認するには：
 - `supabase/sql/verify-data.sql` を実行してデータの状態を確認
-- 詳細は `docs/DATA_VERIFICATION_GUIDE.md` を参照
+- 詳細は `docs/data/VERIFICATION_GUIDE.md` を参照
 
 ## 1. サンプルアルバムのコピー
 
@@ -86,7 +86,7 @@ SQLスクリプトを実行した後、データが正しく作成されたか�
 
 7. **データ検証（推奨）**
    - `supabase/sql/verify-data.sql` を実行して、データが正しく作成されたか確認
-   - 詳細は `docs/DATA_VERIFICATION_GUIDE.md` を参照
+   - 詳細は `docs/data/VERIFICATION_GUIDE.md` を参照
 
 8. **アプリケーションで確認**
    - アプリケーションをリロード
@@ -101,12 +101,12 @@ SQLスクリプトを実行した後、データが正しく作成されたか�
 
 - **ユーザーIDの指定**：
   - SQL Editorから実行する場合、`auth.uid()`は`NULL`を返すため、ユーザーIDを直接指定する必要があります
-  - 詳細は `docs/SQL_EDITOR_AUTH_ISSUE.md` を参照
+  - 詳細は `docs/troubleshooting/SQL_EDITOR_AUTH_ISSUE.md` を参照
 
 - **画像の参照先**：
   - サンプルデータの画像はUnsplashのURLを使用しています
   - 実際のファイルはSupabase Storageには保存されません
-  - 詳細は `docs/SAMPLE_ALBUM_IMAGE_SOURCE.md` を参照
+  - 詳細は `docs/data/SAMPLE_ALBUM_IMAGE_SOURCE.md` を参照
 
 ## 2. 「新しいアルバム」の削除
 

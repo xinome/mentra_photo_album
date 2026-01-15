@@ -18,10 +18,10 @@
 - 実装済み機能
 - 開発フロー
 
-### 2. `docs/DEVELOPMENT_GUIDE.md`
+### 2. `docs/project/DEVELOPMENT_GUIDE.md`
 完全な開発ガイド。Figma Make、Cursor、Supabase連携の手順を記載。
 
-### 3. `docs/IMPLEMENTATION_STATUS.md`
+### 3. `docs/project/IMPLEMENTATION_STATUS.md`
 実装状況の詳細。実装済み機能と未実装機能の一覧。
 
 ## プロジェクト構造
@@ -61,9 +61,10 @@ mentra_photo_album/
 │       ├── copy-sample-albums.sql   # サンプルデータ作成
 │       └── cleanup-duplicate-albums.sql # 重複削除
 └── docs/
-    ├── DEVELOPMENT_GUIDE.md   # 開発ガイド（重要！）
-    ├── IMPLEMENTATION_STATUS.md # 実装状況（重要！）
-    ├── HANDOVER.md            # このファイル
+    ├── project/
+    │   ├── DEVELOPMENT_GUIDE.md   # 開発ガイド（重要！）
+    │   ├── IMPLEMENTATION_STATUS.md # 実装状況（重要！）
+    │   └── HANDOVER.md            # このファイル
     └── ...                    # その他のドキュメント
 ```
 
@@ -86,6 +87,7 @@ mentra_photo_album/
   - 写真数の表示
 - **アルバム作成** (`src/components/AlbumCreator.tsx`)
   - タイトル、説明入力
+  - カテゴリ選択（実装済み）
   - 公開設定（トグル）
   - 写真アップロード（複数選択）
   - ファイル名サニタイズ（日本語対応）
@@ -95,6 +97,15 @@ mentra_photo_album/
   - アルバム情報表示
   - 写真一覧表示
   - Unsplash URL / Supabase Storage対応
+  - 写真削除機能（投稿者本人のみ）
+  - 写真キャプション編集機能
+- **アルバム編集** (`src/app/albums/[id]/edit/page.tsx`, `src/components/AlbumEditor.tsx`)
+  - タイトル・説明・カテゴリの編集
+  - アイキャッチ画像の変更・削除
+  - 公開設定の変更
+- **アルバム削除** (`src/app/albums/[id]/page.tsx`)
+  - 作成者本人のみ削除可能
+  - ストレージからの写真削除も含む
 
 ### ✅ データベース
 - テーブル構造（`profiles`, `albums`, `photos`）
@@ -104,10 +115,10 @@ mentra_photo_album/
 ## 未実装機能（次の実装候補）
 
 ### ❌ アルバム機能
-- アルバム編集
-- アルバム削除（UI）
-- 写真削除
-- 写真編集（キャプション等）
+- ✅ アルバム編集（実装済み）
+- ✅ アルバム削除（UI）（実装済み）
+- ✅ 写真削除（実装済み）
+- ✅ 写真編集（キャプション等）（実装済み）
 
 ### ❌ 共有機能
 - 共有リンク生成
@@ -197,7 +208,7 @@ npm run dev
 
 ### 2. Cursorでの実装
 1. `.cursorrules`を確認（自動読み込み）
-2. `docs/DEVELOPMENT_GUIDE.md`を参照
+2. `docs/project/DEVELOPMENT_GUIDE.md`を参照
 3. 実装パターンを参照
 4. 実装を開始
 
@@ -229,23 +240,26 @@ npm run dev
 
 ### 現在の状態
 - アルバム作成機能は正常に動作
+- アルバム編集機能が実装済み
+- アルバム削除機能が実装済み
+- 写真削除・キャプション編集機能が実装済み
 - 写真アップロードはSupabase Storageに保存される
 - アルバム一覧は正常に表示される
 - 重複アルバムは削除済み
 
 ## 次のステップ（推奨）
 
-1. **アルバム編集機能**
-   - タイトル・説明の編集
-   - 写真の追加・削除
-
-2. **共有機能**
+1. **共有機能**
    - 共有リンク生成
    - 共有アルバム表示
 
-3. **パフォーマンス改善**
+2. **パフォーマンス改善**
    - 画像の遅延読み込み
    - クエリの最適化
+
+3. **セキュリティ強化**
+   - ファイルサイズ制限
+   - レート制限
 
 ## トラブルシューティング
 
@@ -264,11 +278,11 @@ npm run dev
 
 ## 参考ドキュメント
 
-- **開発ガイド**: `docs/DEVELOPMENT_GUIDE.md`
-- **実装状況**: `docs/IMPLEMENTATION_STATUS.md`
+- **開発ガイド**: `docs/project/DEVELOPMENT_GUIDE.md`
+- **実装状況**: `docs/project/IMPLEMENTATION_STATUS.md`
 - **セットアップガイド**: `docs/setup/SETUP_GUIDE.md`
 - **データベース構造**: `docs/database/TABLE_STRUCTURE.md`
-- **サンプルデータ管理**: `docs/SAMPLE_DATA_MANAGEMENT.md`
+- **サンプルデータ管理**: `docs/data/SAMPLE_DATA_MANAGEMENT.md`
 
 ## 重要な注意事項
 

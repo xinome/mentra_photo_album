@@ -164,7 +164,7 @@
 
 ## 🔗 関連ドキュメント
 
-* [開発ガイド](DEVELOPMENT_GUIDE.md)
-* [実装状況](IMPLEMENTATION_STATUS.md)
-* [引き継ぎテキスト](HANDOVER.md)
+* [開発ガイド](../project/DEVELOPMENT_GUIDE.md)
+* [実装状況](../project/IMPLEMENTATION_STATUS.md)
+* [引き継ぎテキスト](../project/HANDOVER.md)
 

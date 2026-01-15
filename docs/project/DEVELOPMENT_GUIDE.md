@@ -94,8 +94,8 @@ npm run supabase:types
 
 #### 1. 事前準備
 - `.cursorrules`を確認（自動読み込み済み）
-- `docs/HANDOVER.md`を参照してプロジェクトの状態を確認
-- `docs/DEVELOPMENT_GUIDE.md`で実装パターンを確認
+- `docs/project/HANDOVER.md`を参照してプロジェクトの状態を確認
+- `docs/project/DEVELOPMENT_GUIDE.md`で実装パターンを確認
 
 #### 2. Figma Makeからの実装フロー（推奨手順）
 
@@ -380,7 +380,7 @@ if (error) {
 ## 参考資料
 
 - [実装状況](IMPLEMENTATION_STATUS.md)
-- [セットアップガイド](setup/SETUP_GUIDE.md)
-- [データベース構造](database/TABLE_STRUCTURE.md)
-- [サンプルデータ管理](SAMPLE_DATA_MANAGEMENT.md)
+- [セットアップガイド](../setup/SETUP_GUIDE.md)
+- [データベース構造](../database/TABLE_STRUCTURE.md)
+- [サンプルデータ管理](../data/SAMPLE_DATA_MANAGEMENT.md)
 
