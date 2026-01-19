@@ -56,7 +56,7 @@ const categoryLabels = {
   other: "その他",
 };
 
-export function SharedAlbumViewer({ album, onDownload, onShare }: SharedAlbumViewerProps) {
+export const SharedAlbumViewer = ({ album, onDownload, onShare }: SharedAlbumViewerProps) => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("newest");
@@ -411,4 +411,4 @@ export function SharedAlbumViewer({ album, onDownload, onShare }: SharedAlbumVie
       </div>
     </div>
   );
-}
+};

@@ -16,7 +16,7 @@ interface MagicLinkSentProps {
   error?: string | null;
 }
 
-export function MagicLinkSent({ 
+export const MagicLinkSent = ({ 
   email, 
   onBack, 
   onResend, 
@@ -25,7 +25,7 @@ export function MagicLinkSent({
   resendCountdown = 0,
   onMockLogin,
   error
-}: MagicLinkSentProps) {
+}: MagicLinkSentProps) => {
   const emailProvider = email.split('@')[1];
   
   const getEmailProviderUrl = (provider: string) => {
@@ -187,4 +187,4 @@ export function MagicLinkSent({
       </div>
     </div>
   );
-}
+};

@@ -40,7 +40,7 @@ const categoryColors = {
   other: "bg-gray-100 text-gray-800",
 };
 
-export function Dashboard({ albums, onCreateAlbum, onOpenAlbum }: DashboardProps) {
+export const Dashboard = ({ albums, onCreateAlbum, onOpenAlbum }: DashboardProps) => {
   const [showAll, setShowAll] = useState(false);
   const DISPLAY_LIMIT = 6;
   const displayedAlbums = showAll ? albums : albums.slice(0, DISPLAY_LIMIT);
@@ -281,4 +281,4 @@ export function Dashboard({ albums, onCreateAlbum, onOpenAlbum }: DashboardProps
       </div>
     </div>
   );
-}
+};

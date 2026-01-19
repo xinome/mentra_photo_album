@@ -24,13 +24,13 @@ interface StorageManagementSectionProps {
   cleaning?: boolean;
 }
 
-export function StorageManagementSection({
+export const StorageManagementSection = ({
   selectedFilesCount = 0,
   onDeleteSelected,
   onCleanup,
   deleting = false,
   cleaning = false,
-}: StorageManagementSectionProps) {
+}: StorageManagementSectionProps) => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [cleanupDialogOpen, setCleanupDialogOpen] = useState(false);
 
@@ -126,5 +126,5 @@ export function StorageManagementSection({
       </CardContent>
     </Card>
   );
-}
+};
 

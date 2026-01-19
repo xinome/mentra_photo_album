@@ -14,7 +14,7 @@ interface MagicLinkLoginProps {
   error?: string | null;
 }
 
-export function MagicLinkLogin(props: MagicLinkLoginProps) {
+export const MagicLinkLogin = (props: MagicLinkLoginProps) => {
   const { onSendMagicLink, isLoading = false, error } = props;
   const [email, setEmail] = useState("");
   const trimmedEmail = email.trim();
@@ -194,4 +194,4 @@ export function MagicLinkLogin(props: MagicLinkLoginProps) {
       </div>
     </div>
   );
-}
+};

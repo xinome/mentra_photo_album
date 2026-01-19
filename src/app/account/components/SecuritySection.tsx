@@ -12,10 +12,10 @@ interface SecuritySectionProps {
   saving?: boolean;
 }
 
-export function SecuritySection({
+export const SecuritySection = ({
   onChangePassword,
   saving = false,
-}: SecuritySectionProps) {
+}: SecuritySectionProps) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -171,5 +171,5 @@ export function SecuritySection({
       </CardContent>
     </Card>
   );
-}
+};
 

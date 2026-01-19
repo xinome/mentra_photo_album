@@ -15,7 +15,7 @@ interface LoginFormProps {
   onSignup: (name: string, email: string, password: string) => void;
 }
 
-export function LoginForm({ onLogin, onSignup }: LoginFormProps) {
+export const LoginForm = ({ onLogin, onSignup }: LoginFormProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [signupData, setSignupData] = useState({ name: "", email: "", password: "" });
@@ -231,4 +231,4 @@ export function LoginForm({ onLogin, onSignup }: LoginFormProps) {
       </div>
     </div>
   );
-}
+};

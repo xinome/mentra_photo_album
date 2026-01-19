@@ -9,11 +9,11 @@ interface AccountManagementSectionProps {
   lastSignInAt: string | null;
 }
 
-export function AccountManagementSection({
+export const AccountManagementSection = ({
   userId,
   createdAt,
   lastSignInAt,
-}: AccountManagementSectionProps) {
+}: AccountManagementSectionProps) => {
   const formatDate = (dateString: string | null): string => {
     if (!dateString) return "-";
     try {
@@ -69,5 +69,5 @@ export function AccountManagementSection({
       </CardContent>
     </Card>
   );
-}
+};
 

@@ -23,10 +23,10 @@ interface DangerZoneSectionProps {
   deleting?: boolean;
 }
 
-export function DangerZoneSection({
+export const DangerZoneSection = ({
   onDeleteAccount,
   deleting = false,
-}: DangerZoneSectionProps) {
+}: DangerZoneSectionProps) => {
   const [confirmText, setConfirmText] = useState("");
   const [open, setOpen] = useState(false);
 
@@ -131,5 +131,5 @@ export function DangerZoneSection({
       </CardContent>
     </Card>
   );
-}
+};
 
