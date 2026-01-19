@@ -53,7 +53,7 @@ interface ShareData {
   }>;
 }
 
-export default function SharePage() {
+const SharePage = () => {
   const params = useParams();
   const token = params.token as string;
   
@@ -161,4 +161,6 @@ export default function SharePage() {
       onShare={handleShare}
     />
   );
-}
+};
+
+export default SharePage;

@@ -6,7 +6,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { supabase } from "@/lib/supabase";
 import { ProfileSetup } from "@/components/ProfileSetup";
 
-export default function ProfileSetupPage() {
+const ProfileSetupPage = () => {
   const router = useRouter();
   const { user, loading } = useAuth();
   const [checking, setChecking] = useState(true);
@@ -122,5 +122,7 @@ export default function ProfileSetupPage() {
       onSkip={handleSkip}
     />
   );
-}
+};
+
+export default ProfileSetupPage;
 

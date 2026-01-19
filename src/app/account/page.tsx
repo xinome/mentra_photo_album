@@ -24,7 +24,7 @@ interface Profile {
   created_at: string;
 }
 
-export default function AccountPage() {
+const AccountPage = () => {
   const { user } = useAuth();
   const router = useRouter();
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -425,4 +425,6 @@ export default function AccountPage() {
       </div>
     </AuthGuard>
   );
-}
+};
+
+export default AccountPage;

@@ -14,10 +14,10 @@ interface PrivacySectionProps {
   saving?: boolean;
 }
 
-export function PrivacySection({
+export const PrivacySection = ({
   onPrivacyUpdate,
   saving = false,
-}: PrivacySectionProps) {
+}: PrivacySectionProps) => {
   const [profileVisibility, setProfileVisibility] = useState(true);
   const [dataSharing, setDataSharing] = useState(false);
 
@@ -103,5 +103,5 @@ export function PrivacySection({
       </CardContent>
     </Card>
   );
-}
+};
 

@@ -72,7 +72,7 @@ const categoryLabels = {
   other: "その他",
 };
 
-export function AlbumViewer({ album, onBack, onShare, onDownload, onLikePhoto, onEdit, canEdit, onDelete, canDelete, deleting }: AlbumViewerProps) {
+export const AlbumViewer = ({ album, onBack, onShare, onDownload, onLikePhoto, onEdit, canEdit, onDelete, canDelete, deleting }: AlbumViewerProps) => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("newest");
@@ -419,4 +419,4 @@ export function AlbumViewer({ album, onBack, onShare, onDownload, onLikePhoto, o
       </div>
     </div>
   );
-}
+};

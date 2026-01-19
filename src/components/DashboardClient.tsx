@@ -46,7 +46,7 @@ const categoryColors = {
   other: "bg-gray-100 text-gray-800",
 };
 
-export function DashboardClient({ albums, stats }: DashboardClientProps) {
+export const DashboardClient = ({ albums, stats }: DashboardClientProps) => {
   const router = useRouter();
   const DISPLAY_LIMIT = 6;
   const displayedAlbums = albums.slice(0, DISPLAY_LIMIT);
@@ -276,5 +276,5 @@ export function DashboardClient({ albums, stats }: DashboardClientProps) {
       </div>
     </div>
   );
-}
+};
 

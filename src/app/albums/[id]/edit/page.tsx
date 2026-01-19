@@ -16,7 +16,7 @@ interface AlbumUpdateData {
   removeCoverImage?: boolean;
 }
 
-export default function AlbumEditPage() {
+const AlbumEditPage = () => {
   const router = useRouter();
   const params = useParams();
   const { user } = useAuth();
@@ -262,5 +262,7 @@ export default function AlbumEditPage() {
       onSave={handleSave}
     />
   );
-}
+};
+
+export default AlbumEditPage;
 

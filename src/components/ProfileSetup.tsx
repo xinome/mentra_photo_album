@@ -24,7 +24,7 @@ interface ProfileData {
   agreeToTerms: boolean;
 }
 
-export function ProfileSetup({ email, onComplete, onSkip }: ProfileSetupProps) {
+export const ProfileSetup = ({ email, onComplete, onSkip }: ProfileSetupProps) => {
   const [profileData, setProfileData] = useState<ProfileData>({
     displayName: "",
     avatar: "",
@@ -294,4 +294,4 @@ export function ProfileSetup({ email, onComplete, onSkip }: ProfileSetupProps) {
       </div>
     </div>
   );
-}
+};

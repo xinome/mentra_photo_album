@@ -18,14 +18,14 @@ interface ProfileSectionProps {
   saving?: boolean;
 }
 
-export function ProfileSection({
+export const ProfileSection = ({
   email,
   displayName,
   bio,
   avatarUrl,
   onUpdate,
   saving = false,
-}: ProfileSectionProps) {
+}: ProfileSectionProps) => {
   const [localDisplayName, setLocalDisplayName] = useState(displayName || "");
   const [localBio, setLocalBio] = useState(bio || "");
   const [avatarPreview, setAvatarPreview] = useState<string | null>(avatarUrl);
@@ -202,5 +202,5 @@ export function ProfileSection({
       </CardContent>
     </Card>
   );
-}
+};
 

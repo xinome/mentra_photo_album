@@ -1,0 +1,97 @@
+## 🔧 リファクタリングの概要
+
+プロジェクト全体の関数定義を、従来の`function`形式からアロー関数式（arrow function）に統一します。コードの一貫性を向上させ、モダンなJavaScript/TypeScriptのスタイルに合わせます。
+
+## 🎯 目的
+
+* コードスタイルの統一（アロー関数式への統一）
+* モダンなJavaScript/TypeScriptコーディング規約への準拠
+* コードの可読性向上
+* 一貫性の向上によるメンテナンス性の向上
+
+## 📊 調査結果
+
+プロジェクト全体で**約295箇所**の`function`形式の関数定義を確認しました。
+
+### カテゴリ別内訳
+
+1. **ユーティリティ関数（lib配下）**: 5ファイル
+2. **カスタムコンポーネント**: 約51ファイル
+3. **ページコンポーネント**: 約14ファイル
+4. **UIコンポーネント（shadcn/ui）**: 約30ファイル（**変更対象外**）
+
+## ✅ リファクタリング計画
+
+### フェーズ1: ユーティリティ関数（影響範囲が明確・小さい順）
+
+#### 1.1 `lib/config.ts` - 影響範囲: 小
+* `getBaseUrl()`, `getAuthRedirectUrl()`
+* 使用箇所: `src/app/(auth)/login/page.tsx` (2箇所)
+
+#### 1.2 `lib/auth-errors.ts` - 影響範囲: 小
+* `getAuthErrorMessage()`, `getAuthErrorType()`
+* 使用箇所: `src/app/(auth)/login/page.tsx` (2箇所)
+
+#### 1.3 `lib/category-images.ts` - 影響範囲: 中
+* `getCategoryDefaultImage()`
+* 使用箇所: 4ファイル、合計6箇所
+
+#### 1.4 `components/ui/utils.ts` - 影響範囲: 大
+* `cn()` - プロジェクト全体で多用
+
+### フェーズ2: カスタムフック
+* `components/ui/use-mobile.ts` - `useIsMobile()`
+
+### フェーズ3: カスタムコンポーネント（段階的に実施）
+* `Header`, `AuthProvider`, `AuthGuard`, `Dashboard`, `AlbumCreator`, `AlbumViewer`など約51ファイル
+
+### フェーズ4: ページコンポーネント（任意）
+* Next.js App Routerのページコンポーネント約14ファイル
+
+## ⚠️ 注意事項
+
+### 変更対象外
+* **`src/components/ui/`配下のshadcn/uiコンポーネント**（約30ファイル）
+  - 外部ライブラリ由来のコードのため変更しない
+
+### 技術的な注意点
+
+1. **ホイスティング（Hoisting）の違い**に注意
+2. **`this`の扱い**（Reactコンポーネントでは通常問題なし）
+3. **型定義の整合性**を確認
+
+## ✅ 検証項目
+
+### フェーズ1
+* [ ] 各ユーティリティ関数が正常に動作すること
+* [ ] 既存機能が正常に動作すること
+* [ ] `cn()`関数でスタイリングが正常に動作すること
+
+### フェーズ2-3
+* [ ] 各コンポーネントが正常にレンダリングされること
+* [ ] 既存機能が正常に動作すること
+
+### 全体検証
+* [ ] ビルドエラーが発生しないこと
+* [ ] 型チェックが通ること
+* [ ] リンターエラーが発生しないこと
+* [ ] パフォーマンスに影響がないこと
+
+## 📝 変換例
+
+```typescript
+// Before
+export function getBaseUrl(): string {
+  return window.location.origin;
+}
+
+// After
+export const getBaseUrl = (): string => {
+  return window.location.origin;
+};
+```
+
+## 📚 詳細
+
+詳細な調査結果と実装計画は以下を参照してください:
+`docs/issues/REFACTOR_FUNCTION_TO_ARROW.md`

@@ -36,11 +36,11 @@ interface PhotoUploadSectionProps {
   uploadProgress?: number;
 }
 
-export function PhotoUploadSection({
+export const PhotoUploadSection = ({
   onUpload,
   uploading = false,
   uploadProgress = 0,
-}: PhotoUploadSectionProps) {
+}: PhotoUploadSectionProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [photos, setPhotos] = useState<PhotoPreview[]>([]);
   const [isDragging, setIsDragging] = useState(false);
@@ -365,4 +365,4 @@ export function PhotoUploadSection({
       </CardContent>
     </Card>
   );
-}
+};

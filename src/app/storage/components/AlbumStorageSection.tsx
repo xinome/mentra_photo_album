@@ -29,14 +29,14 @@ interface AlbumStorageSectionProps {
   onSearchChange?: (query: string) => void;
 }
 
-export function AlbumStorageSection({
+export const AlbumStorageSection = ({
   albums,
   loading = false,
   totalStorage,
   onDeleteAlbum,
   searchQuery = "",
   onSearchChange,
-}: AlbumStorageSectionProps) {
+}: AlbumStorageSectionProps) => {
   const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery);
 
   // ファイルサイズをフォーマット
@@ -234,5 +234,5 @@ export function AlbumStorageSection({
       </CardContent>
     </Card>
   );
-}
+};
 

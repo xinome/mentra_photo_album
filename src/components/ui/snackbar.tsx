@@ -13,11 +13,11 @@ interface SnackbarMessage {
 
 interface SnackbarProps {
   message: SnackbarMessage | null;
-  onClose: () => void;
+  onClose?: () => void;
   duration?: number; // 表示時間（ミリ秒、デフォルト: 3000ms）
 }
 
-export function Snackbar({ message, onClose, duration = 3000 }: SnackbarProps) {
+export const Snackbar = ({ message, onClose, duration = 3000 }: SnackbarProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const closeTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -42,7 +42,7 @@ export function Snackbar({ message, onClose, duration = 3000 }: SnackbarProps) {
         setIsVisible(false);
         // アニメーション完了後にメッセージをクリア
         closeTimerRef.current = setTimeout(() => {
-          onClose();
+          onClose?.();
         }, 300);
       }, duration);
 
@@ -71,7 +71,7 @@ export function Snackbar({ message, onClose, duration = 3000 }: SnackbarProps) {
     }
     setIsVisible(false);
     setTimeout(() => {
-      onClose();
+      onClose?.();
     }, 300);
   };
 
@@ -121,4 +121,4 @@ export function Snackbar({ message, onClose, duration = 3000 }: SnackbarProps) {
       </div>
     </div>
   );
-}
+};

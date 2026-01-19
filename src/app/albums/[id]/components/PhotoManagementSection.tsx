@@ -36,7 +36,7 @@ interface PhotoManagementSectionProps {
   currentUserId?: string; // 追加：現在のユーザーID
 }
 
-export function PhotoManagementSection({
+export const PhotoManagementSection = ({
   photos,
   onDelete,
   onUpdateCaption,
@@ -44,7 +44,7 @@ export function PhotoManagementSection({
   deleting = false,
   updating = false,
   currentUserId, // 追加
-}: PhotoManagementSectionProps) {
+}: PhotoManagementSectionProps) => {
   const [editingPhotoId, setEditingPhotoId] = useState<string | null>(null);
   const [editCaption, setEditCaption] = useState("");
   const [draggedPhotoId, setDraggedPhotoId] = useState<string | null>(null);
@@ -248,5 +248,5 @@ export function PhotoManagementSection({
       </CardContent>
     </Card>
   );
-}
+};
 

@@ -120,7 +120,7 @@ export default async function AlbumsPage() {
   );
 }
 
-function AlbumsListSkeleton() {
+const AlbumsListSkeleton = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <Skeleton className="h-12 w-64 mb-8" />
@@ -131,4 +131,4 @@ function AlbumsListSkeleton() {
       </div>
     </div>
   );
-}
+};

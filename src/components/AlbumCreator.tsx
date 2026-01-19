@@ -36,7 +36,7 @@ interface PhotoPreview {
 }
 
 
-export function AlbumCreator({ onBack, onSave }: AlbumCreatorProps) {
+export const AlbumCreator = ({ onBack, onSave }: AlbumCreatorProps) => {
   const [albumData, setAlbumData] = useState<AlbumData>({
     title: "",
     description: "",
@@ -450,4 +450,4 @@ export function AlbumCreator({ onBack, onSave }: AlbumCreatorProps) {
       </div>
     </div>
   );
-}
+};

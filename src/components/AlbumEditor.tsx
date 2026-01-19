@@ -35,7 +35,7 @@ interface AlbumUpdateData {
   removeCoverImage?: boolean;
 }
 
-export function AlbumEditor({ albumId, initialData, onBack, onSave }: AlbumEditorProps) {
+export const AlbumEditor = ({ albumId, initialData, onBack, onSave }: AlbumEditorProps) => {
   const [albumData, setAlbumData] = useState({
     title: initialData.title,
     description: initialData.description || "",
@@ -304,5 +304,5 @@ export function AlbumEditor({ albumId, initialData, onBack, onSave }: AlbumEdito
       </div>
     </div>
   );
-}
+};
 

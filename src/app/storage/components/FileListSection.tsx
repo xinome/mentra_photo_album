@@ -38,7 +38,7 @@ interface FileListSectionProps {
   onSelectAll?: () => void;
 }
 
-export function FileListSection({
+export const FileListSection = ({
   files,
   loading = false,
   onDelete,
@@ -46,7 +46,7 @@ export function FileListSection({
   selectedFiles = [],
   onSelectFile,
   onSelectAll,
-}: FileListSectionProps) {
+}: FileListSectionProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"name" | "date" | "size">("date");
   const [filterType, setFilterType] = useState<string>("all");
@@ -292,5 +292,5 @@ export function FileListSection({
       </CardContent>
     </Card>
   );
-}
+};
 

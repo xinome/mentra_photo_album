@@ -3,7 +3,7 @@ import { AuthError } from "@supabase/supabase-js";
 /**
  * Supabase Authエラーをユーザーフレンドリーな日本語メッセージに変換
  */
-export function getAuthErrorMessage(error: AuthError | null): string {
+export const getAuthErrorMessage = (error: AuthError | null): string => {
   if (!error) {
     return "";
   }
@@ -46,12 +46,12 @@ export function getAuthErrorMessage(error: AuthError | null): string {
       // デフォルトメッセージ
       return "Magic Linkの送信に失敗しました。もう一度お試しください。問題が続く場合は、しばらく時間をおいてから再度お試しください。";
   }
-}
+};
 
 /**
  * エラーコードから簡潔なエラータイプを取得
  */
-export function getAuthErrorType(error: AuthError | null): "validation" | "rate_limit" | "network" | "server" | "unknown" {
+export const getAuthErrorType = (error: AuthError | null): "validation" | "rate_limit" | "network" | "server" | "unknown" => {
   if (!error) {
     return "unknown";
   }
@@ -75,4 +75,4 @@ export function getAuthErrorType(error: AuthError | null): "validation" | "rate_
   }
 
   return "unknown";
-}
+};

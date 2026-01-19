@@ -9,7 +9,7 @@ import { MagicLinkSent } from "@/components/MagicLinkSent";
 // 動的レンダリングを強制（プリレンダリングを無効化）
 export const dynamic = 'force-dynamic';
 
-export default function LoginPage() {
+const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -97,4 +97,6 @@ export default function LoginPage() {
       error={error}
     />
   );
-}
+};
+
+export default LoginPage;

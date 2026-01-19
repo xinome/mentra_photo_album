@@ -16,7 +16,7 @@ interface HeaderProps {
   onLogout?: () => void;
 }
 
-export function Header({ user, onLogout }: HeaderProps) {
+export const Header = ({ user, onLogout }: HeaderProps) => {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
@@ -191,4 +191,4 @@ export function Header({ user, onLogout }: HeaderProps) {
       </div>
     </header>
   );
-}
+};

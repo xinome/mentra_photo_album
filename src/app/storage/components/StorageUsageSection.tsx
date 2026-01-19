@@ -11,12 +11,12 @@ interface StorageUsageSectionProps {
   averageFileSize?: number; // 平均ファイルサイズ（バイト単位）
 }
 
-export function StorageUsageSection({
+export const StorageUsageSection = ({
   usedStorage,
   totalStorage,
   totalFiles = 0,
   averageFileSize = 0,
-}: StorageUsageSectionProps) {
+}: StorageUsageSectionProps) => {
   // バイトを適切な単位に変換
   const formatBytes = (bytes: number): { value: number; unit: string } => {
     if (bytes === 0) return { value: 0, unit: "B" };
@@ -119,5 +119,5 @@ export function StorageUsageSection({
       </CardContent>
     </Card>
   );
-}
+};
 

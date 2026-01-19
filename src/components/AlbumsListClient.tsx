@@ -44,7 +44,7 @@ const categoryColors = {
 type SortOption = "created_desc" | "created_asc" | "title_asc" | "title_desc";
 type CategoryFilter = "all" | "wedding" | "event" | "family" | "sports" | "other";
 
-export function AlbumsListClient({ albums }: AlbumsListClientProps) {
+export const AlbumsListClient = ({ albums }: AlbumsListClientProps) => {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
@@ -219,5 +219,5 @@ export function AlbumsListClient({ albums }: AlbumsListClientProps) {
       </div>
     </div>
   );
-}
+};
 
