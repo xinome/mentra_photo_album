@@ -48,7 +48,7 @@ interface Album {
   }>;
 }
 
-export default function AlbumDetailPage() {
+const AlbumDetailPage = () => {
   const router = useRouter();
   const params = useParams();
   const searchParams = useSearchParams();
@@ -739,4 +739,6 @@ export default function AlbumDetailPage() {
       </div>
     </div>
   );
-}
+};
+
+export default AlbumDetailPage;

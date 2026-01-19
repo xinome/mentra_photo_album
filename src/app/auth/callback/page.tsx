@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic';
  * Magic Link認証後のリダイレクト先
  * プロフィールチェックを行い、適切なページへ遷移する
  */
-export default function AuthCallbackPage() {
+const AuthCallbackPage = () => {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const [checking, setChecking] = useState(true);
@@ -106,5 +106,7 @@ export default function AuthCallbackPage() {
       </div>
     </div>
   );
-}
+};
+
+export default AuthCallbackPage;
 

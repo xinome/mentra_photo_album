@@ -16,7 +16,7 @@ interface AlbumData {
   photos: File[];
 }
 
-export default function CreateAlbumPage() {
+const CreateAlbumPage = () => {
   const { user } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -168,5 +168,7 @@ export default function CreateAlbumPage() {
       </div>
     </AuthGuard>
   );
-}
+};
+
+export default CreateAlbumPage;
 

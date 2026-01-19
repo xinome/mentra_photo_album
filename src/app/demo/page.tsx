@@ -1,6 +1,8 @@
 import App from "@/components/App";
 
-export default function DemoPage() {
+const DemoPage = () => {
   return <App />;
-}
+};
+
+export default DemoPage;
 

@@ -65,7 +65,7 @@ type AppState =
   | "viewing"
   | "shared-viewing";
 
-export default function App() {
+const App = () => {
   const [currentState, setCurrentState] =
     useState<AppState>("login");
   const [currentUser, setCurrentUser] = useState<User | null>(

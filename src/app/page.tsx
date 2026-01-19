@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Camera, Heart, Users, Sparkles } from "lucide-react";
 
-export default function Home() {
+const Home = () => {
   const { user, loading } = useAuth();
   const router = useRouter();
 
@@ -138,4 +138,6 @@ export default function Home() {
       </div>
     </AuthGuard>
   );
-}
+};
+
+export default Home;

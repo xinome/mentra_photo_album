@@ -23,7 +23,7 @@ interface AlbumStorage {
   updatedAt: string;
 }
 
-export default function StoragePage() {
+const StoragePage = () => {
   const { user } = useAuth();
   const router = useRouter();
   const [profile, setProfile] = useState<{
@@ -346,5 +346,7 @@ export default function StoragePage() {
       </div>
     </AuthGuard>
   );
-}
+};
+
+export default StoragePage;
 
