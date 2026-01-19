@@ -17,10 +17,10 @@ export const categoryDefaultImages: Record<CategoryType, string> = {
 /**
  * カテゴリに応じたデフォルト画像を取得
  */
-export function getCategoryDefaultImage(category: CategoryType | string | null | undefined): string {
+export const getCategoryDefaultImage = (category: CategoryType | string | null | undefined): string => {
   if (!category || !(category in categoryDefaultImages)) {
     return categoryDefaultImages.other;
   }
   return categoryDefaultImages[category as CategoryType];
-}
+};
 

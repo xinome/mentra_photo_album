@@ -8,7 +8,7 @@
  * - ブラウザ環境: `location.origin`を使用して自動検出
  * - サーバー環境: 環境変数から取得（フォールバックあり）
  */
-export function getBaseUrl(): string {
+export const getBaseUrl = (): string => {
   // ブラウザ環境の場合
   if (typeof window !== 'undefined') {
     return window.location.origin;
@@ -23,7 +23,7 @@ export function getBaseUrl(): string {
 
   // デフォルト: 環境変数から取得、なければ適切なフォールバック
   return process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-}
+};
 
 /**
  * Magic Link認証後のリダイレクト先URLを取得
@@ -33,7 +33,7 @@ export function getBaseUrl(): string {
  * 注意: ブラウザ環境では必ず現在のURLベースを使用します
  * localhost開発環境でも正しく動作するように、動的にURLを生成します
  */
-export function getAuthRedirectUrl(): string {
+export const getAuthRedirectUrl = (): string => {
   // ブラウザ環境の場合は必ず現在のURLを使用（localhost対応）
   if (typeof window !== 'undefined') {
     // 現在のURLから origin を取得（プロトコル、ホスト、ポートを含む）
@@ -57,7 +57,7 @@ export function getAuthRedirectUrl(): string {
   
   const baseUrl = getBaseUrl();
   return `${baseUrl}/auth/callback`;
-}
+};
 
 /**
  * サイトのベースURL（公開用）
