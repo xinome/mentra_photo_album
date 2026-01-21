@@ -78,12 +78,19 @@ export const AlbumViewer = ({ album, onBack, onShare, onDownload, onLikePhoto, o
   const [sortBy, setSortBy] = useState("newest");
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
 
-  const filteredPhotos = album.photos
-    .filter((photo) =>
+  const filteredPhotos = (() => {
+    const filtered = album.photos.filter((photo) =>
       photo.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       photo.uploadedBy.name.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-    .sort((a, b) => {
+    );
+
+    // 手動順の場合はソートしない（album.photosの順序をそのまま使用）
+    if (sortBy === "manual") {
+      return filtered;
+    }
+
+    // それ以外の場合はソート
+    return filtered.sort((a, b) => {
       switch (sortBy) {
         case "newest":
           return new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime();
@@ -95,6 +102,7 @@ export const AlbumViewer = ({ album, onBack, onShare, onDownload, onLikePhoto, o
           return 0;
       }
     });
+  })();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -255,6 +263,7 @@ export const AlbumViewer = ({ album, onBack, onShare, onDownload, onLikePhoto, o
               <SelectContent>
                 <SelectItem value="newest">新しい順</SelectItem>
                 <SelectItem value="oldest">古い順</SelectItem>
+                <SelectItem value="manual">手動順</SelectItem>
                 <SelectItem value="likes">いいね順</SelectItem>
               </SelectContent>
             </Select>
