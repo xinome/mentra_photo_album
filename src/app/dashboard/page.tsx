@@ -1,10 +1,11 @@
 import { Suspense } from 'react';
-import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
-import { DashboardClient } from '@/components/DashboardClient';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Header } from '@/components/Header';
+import { createClient } from '@/utils/supabase/server';
+import { getCategoryDefaultImage } from '@/lib/category-images';
 import { AuthGuard } from '@/components/AuthGuard';
+import { DashboardClient } from '@/components/DashboardClient';
+import { Header } from '@/components/Header';
+import { Skeleton } from '@/components/ui/skeleton';
 
 // 動的レンダリングを強制（認証が必要なページのため）
 export const dynamic = 'force-dynamic';
@@ -47,8 +48,31 @@ async function getRecentAlbums() {
       const photoCount = count ?? 0;
       
       // カバー画像を取得
-      let coverImage = "https://images.unsplash.com/photo-1587955793432-7c4ff80918ba?w=400";
-      if (photoCount > 0) {
+      let coverImage = getCategoryDefaultImage(album.category || 'other');
+      
+      // cover_photo_idが設定されている場合はその写真を取得
+      if (album.cover_photo_id) {
+        const { data: coverPhoto } = await supabase
+          .from('photos')
+          .select('storage_key')
+          .eq('id', album.cover_photo_id)
+          .single();
+        
+        if (coverPhoto && (coverPhoto as any).storage_key) {
+          const photoKey = (coverPhoto as any).storage_key;
+          if (photoKey?.startsWith('http')) {
+            coverImage = photoKey;
+          } else {
+            const { data: signedUrl } = await supabase.storage
+              .from('photos')
+              .createSignedUrl(photoKey, 3600);
+            if (signedUrl) {
+              coverImage = signedUrl.signedUrl;
+            }
+          }
+        }
+      } else if (photoCount > 0) {
+        // cover_photo_idが設定されていない場合は最初の写真を使用
         const { data: firstPhoto } = await supabase
           .from('photos')
           .select('storage_key')
@@ -58,7 +82,6 @@ async function getRecentAlbums() {
           .single();
         
         if (firstPhoto) {
-          // storage_keyがURLの場合は直接使用、それ以外はStorageから取得
           const photoKey = (firstPhoto as any).storage_key;
           if (photoKey?.startsWith('http')) {
             coverImage = photoKey;

@@ -233,11 +233,11 @@ export const AlbumCreator = ({ onBack, onSave }: AlbumCreatorProps) => {
                   />
                   {coverImagePreview ? (
                     <div className="relative">
-                      <div className="w-full aspect-video rounded-lg overflow-hidden border border-gray-200">
+                      <div className="w-full max-h-[500px] rounded-lg overflow-hidden border border-gray-200 bg-gray-50 flex items-center justify-center">
                         <ImageWithFallback
                           src={coverImagePreview}
                           alt="Cover preview"
-                          className="w-full h-full object-cover"
+                          className="w-full h-auto max-h-[500px] object-contain"
                         />
                       </div>
                       <Button
@@ -258,11 +258,11 @@ export const AlbumCreator = ({ onBack, onSave }: AlbumCreatorProps) => {
                     </div>
                   ) : albumData.category ? (
                     <div className="relative">
-                      <div className="w-full aspect-video rounded-lg overflow-hidden border border-gray-200">
+                      <div className="w-full max-h-[500px] rounded-lg overflow-hidden border border-gray-200 bg-gray-50 flex items-center justify-center">
                         <ImageWithFallback
                           src={getCategoryDefaultImage(albumData.category)}
                           alt="Default cover preview"
-                          className="w-full h-full object-cover"
+                          className="w-full h-auto max-h-[500px] object-contain"
                         />
                       </div>
                       <div className="absolute inset-0 bg-black/20 flex items-center justify-center">

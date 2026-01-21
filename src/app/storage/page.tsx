@@ -1,16 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAuth } from "@/components/AuthProvider";
-import { AuthGuard } from "@/components/AuthGuard";
-import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import { Database } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+import { getCategoryDefaultImage } from "@/lib/category-images";
+import { AuthGuard } from "@/components/AuthGuard";
+import { useAuth } from "@/components/AuthProvider";
 import { Header } from "@/components/Header";
 import { Snackbar } from "@/components/ui/snackbar";
-import { StorageUsageSection } from "./components/StorageUsageSection";
 import { AlbumStorageSection } from "./components/AlbumStorageSection";
 import { StorageManagementSection } from "./components/StorageManagementSection";
+import { StorageUsageSection } from "./components/StorageUsageSection";
 
 interface AlbumStorage {
   id: string;
@@ -111,8 +112,31 @@ const StoragePage = () => {
             );
 
             // カバー画像を取得
-            let coverImage = "https://images.unsplash.com/photo-1587955793432-7c4ff80918ba?w=400";
-            if (photos.length > 0) {
+            let coverImage = getCategoryDefaultImage(album.category || 'other');
+            
+            // cover_photo_idが設定されている場合はその写真を取得
+            if (album.cover_photo_id) {
+              const { data: coverPhoto } = await supabase
+                .from('photos')
+                .select('storage_key')
+                .eq('id', album.cover_photo_id)
+                .single();
+              
+              if (coverPhoto && (coverPhoto as any).storage_key) {
+                const photoKey = (coverPhoto as any).storage_key;
+                if (photoKey?.startsWith('http')) {
+                  coverImage = photoKey;
+                } else {
+                  const { data: signedUrl } = await supabase.storage
+                    .from('photos')
+                    .createSignedUrl(photoKey, 3600);
+                  if (signedUrl) {
+                    coverImage = signedUrl.signedUrl;
+                  }
+                }
+              }
+            } else if (photos.length > 0) {
+              // cover_photo_idが設定されていない場合は最初の写真を使用
               const firstPhoto = photos[0];
               const photoKey = firstPhoto.storage_key;
               if (photoKey?.startsWith('http')) {

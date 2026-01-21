@@ -211,25 +211,25 @@ export const AlbumEditor = ({ albumId, initialData, onBack, onSave }: AlbumEdito
                   />
                   {displayCoverImage ? (
                     <div className="relative">
-                      <div className="w-32 h-20 rounded-lg overflow-hidden border border-gray-200">
+                      <div className="w-full max-h-[500px] rounded-lg overflow-hidden border border-gray-200 bg-gray-50 flex items-center justify-center">
                         <ImageWithFallback
                           src={displayCoverImage}
                           alt="Cover preview"
-                          className="w-full h-full object-cover"
+                          className="w-full h-auto max-h-[500px] object-contain"
                         />
                       </div>
                       {removeCoverImage && (
                         <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                          <span className="text-xs text-white font-medium">デフォルト</span>
+                          <span className="text-sm text-white font-medium">デフォルト画像</span>
                         </div>
                       )}
-                      <div className="absolute -top-2 -right-2 flex gap-1">
+                      <div className="absolute top-2 right-2 flex gap-2">
                         <Button
                           type="button"
                           variant="outline"
                           size="sm"
                           onClick={() => coverImageInputRef.current?.click()}
-                          className="h-6 px-2 text-xs bg-white"
+                          className="h-8 px-3 text-sm bg-white"
                         >
                           変更
                         </Button>
@@ -238,9 +238,9 @@ export const AlbumEditor = ({ albumId, initialData, onBack, onSave }: AlbumEdito
                           variant="destructive"
                           size="sm"
                           onClick={handleRemoveCoverImage}
-                          className="h-6 w-6 p-0 rounded-full"
+                          className="h-8 w-8 p-0 rounded-full"
                         >
-                          <X className="h-3 w-3" />
+                          <X className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
