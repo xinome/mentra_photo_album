@@ -133,10 +133,19 @@ export const AlbumViewer = ({ album, onBack, onShare, onDownload, onLikePhoto, o
                   <span className="text-xs sm:text-sm">編集</span>
                 </Button>
               )}
-              <Button variant="outline" onClick={onShare} size="sm" className="gap-1.5 sm:gap-2 flex-1 sm:flex-initial">
-                <Share2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                <span className="text-xs sm:text-sm">共有</span>
-              </Button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline" onClick={onShare} size="sm" className="gap-1.5 sm:gap-2 flex-1 sm:flex-initial">
+                      <Share2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                      <span className="text-xs sm:text-sm">共有</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>共有機能は今後実装予定です</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>

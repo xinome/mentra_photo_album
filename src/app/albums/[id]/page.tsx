@@ -211,6 +211,12 @@ const AlbumDetailPage = () => {
   };
 
   const handleShare = async () => {
+    // 共有機能は今後実装予定です
+    alert("共有機能は今後実装予定です。\n今後のアップデートで順次実装いたします。");
+    
+    // TODO: 共有機能の実装（今後実装予定）
+    // 以下の実装はイメージ通りのプレビューができないため、一旦コメントアウト
+    /*
     if (!id) return;
     
     // 共有トークンを生成
@@ -227,6 +233,7 @@ const AlbumDetailPage = () => {
       console.error("共有リンク作成エラー:", error);
       alert("共有リンクの作成に失敗しました");
     }
+    */
   };
 
   const handleDownload = () => {

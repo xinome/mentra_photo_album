@@ -118,10 +118,19 @@ export const SharedAlbumViewer = ({ album, onDownload, onShare }: SharedAlbumVie
 
             <div className="flex items-center gap-2">
               {onShare && (
-                <Button variant="outline" onClick={onShare} className="gap-2">
-                  <Share2 className="h-4 w-4" />
-                  共有
-                </Button>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="outline" onClick={onShare} className="gap-2">
+                        <Share2 className="h-4 w-4" />
+                        共有
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>共有機能は今後実装予定です</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               )}
               {onDownload && (
                 <TooltipProvider>
