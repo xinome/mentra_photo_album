@@ -20,6 +20,7 @@ import {
   AlertDialogTrigger,
 } from "./ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 
 interface Photo {
@@ -132,14 +133,32 @@ export const AlbumViewer = ({ album, onBack, onShare, onDownload, onLikePhoto, o
                   <span className="text-xs sm:text-sm">編集</span>
                 </Button>
               )}
-              <Button variant="outline" onClick={onShare} size="sm" className="gap-1.5 sm:gap-2 flex-1 sm:flex-initial">
-                <Share2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                <span className="text-xs sm:text-sm">共有</span>
-              </Button>
-              <Button variant="outline" onClick={onDownload} size="sm" className="gap-1.5 sm:gap-2 flex-1 sm:flex-initial">
-                <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                <span className="hidden sm:inline">ダウンロード</span>
-              </Button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline" onClick={onShare} size="sm" className="gap-1.5 sm:gap-2 flex-1 sm:flex-initial">
+                      <Share2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                      <span className="text-xs sm:text-sm">共有</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>共有機能は今後実装予定です</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline" onClick={onDownload} size="sm" className="gap-1.5 sm:gap-2 flex-1 sm:flex-initial">
+                      <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                      <span className="hidden sm:inline">ダウンロード</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>アルバムダウンロード機能は今後実装予定です</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
               {/* 削除ボタン（作成者本人のみ表示） */}
               {canDelete && onDelete && (
                 <AlertDialog>

@@ -62,26 +62,65 @@ const SharePage = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // 共有機能は今後実装予定です
+    setLoading(false);
+    setError("共有機能は今後実装予定です。");
+    
+    // TODO: 共有機能の実装（今後実装予定）
+    // 以下の実装はイメージ通りのプレビューができないため、一旦コメントアウト
+    /*
     const fetchSharedAlbum = async () => {
       try {
-        const shareUrl = process.env.NEXT_PUBLIC_SHARE_FUNCTION_URL || process.env.SHARE_FUNCTION_URL;
+        // Supabase URLからEdge FunctionのURLを自動構築
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
         
-        if (!shareUrl) {
-          console.error("共有機能のURLが設定されていません");
+        if (!supabaseUrl) {
+          console.error("Supabase URLが設定されていません");
           setError("共有機能が利用できません");
           setLoading(false);
           return;
         }
 
-        const res = await fetch(`${shareUrl}?token=${token}`, { cache: "no-store" });
+        // Edge FunctionのURLを構築
+        // 例: https://<project-ref>.supabase.co/functions/v1/share
+        const shareFunctionUrl = `${supabaseUrl}/functions/v1/share`;
+        
+        const res = await fetch(`${shareFunctionUrl}?token=${token}`, { cache: "no-store" });
         
         if (!res.ok) {
-          setError("リンクが無効です。");
+          // エラーレスポンスの詳細を取得
+          let errorMessage = "リンクが無効です。";
+          try {
+            const errorData = await res.clone().json();
+            if (errorData.error) {
+              errorMessage = errorData.error;
+            }
+          } catch {
+            // JSON解析に失敗した場合はデフォルトメッセージを使用
+          }
+          
+          // ステータスコードに応じたエラーメッセージ
+          if (res.status === 404) {
+            errorMessage = "共有リンクが見つかりません。リンクが無効または期限切れの可能性があります。";
+          } else if (res.status === 403) {
+            errorMessage = "この共有リンクは無効または期限切れです。";
+          } else if (res.status === 500) {
+            errorMessage = "サーバーエラーが発生しました。しばらくしてから再度お試しください。";
+          }
+          
+          setError(errorMessage);
           setLoading(false);
           return;
         }
 
         const data: ShareData = await res.json();
+        
+        // データの検証
+        if (!data || !data.album) {
+          setError("アルバムデータの取得に失敗しました。");
+          setLoading(false);
+          return;
+        }
         
         const photos: Photo[] = data.photos.map((photo) => ({
           id: photo.id,
@@ -118,11 +157,11 @@ const SharePage = () => {
     if (token) {
       fetchSharedAlbum();
     }
+    */
   }, [token]);
 
   const handleDownload = () => {
-    alert("アルバムのダウンロードを開始します...");
-    // TODO: ダウンロード機能の実装
+    alert("アルバムダウンロード機能は今後実装予定です。");
   };
 
   const handleShare = async () => {
@@ -146,9 +185,14 @@ const SharePage = () => {
   if (error || !album) {
     return (
       <main className="p-6 text-center min-h-screen flex items-center justify-center">
-        <div>
-          <h1 className="text-xl font-semibold mb-2">エラー</h1>
-          <p className="text-gray-600">{error || "リンクが無効です。"}</p>
+        <div className="max-w-md">
+          <h1 className="text-2xl font-semibold mb-4">共有機能は今後実装予定です</h1>
+          <p className="text-gray-600 mb-4">
+            共有アルバムの表示機能は現在開発中です。
+          </p>
+          <p className="text-sm text-gray-500">
+            {error || "リンクが無効です。"}
+          </p>
         </div>
       </main>
     );

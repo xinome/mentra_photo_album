@@ -9,6 +9,7 @@ import { Badge } from "./ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 
 interface Photo {
@@ -117,16 +118,34 @@ export const SharedAlbumViewer = ({ album, onDownload, onShare }: SharedAlbumVie
 
             <div className="flex items-center gap-2">
               {onShare && (
-                <Button variant="outline" onClick={onShare} className="gap-2">
-                  <Share2 className="h-4 w-4" />
-                  共有
-                </Button>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="outline" onClick={onShare} className="gap-2">
+                        <Share2 className="h-4 w-4" />
+                        共有
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>共有機能は今後実装予定です</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               )}
               {onDownload && (
-                <Button variant="outline" onClick={onDownload} className="gap-2">
-                  <Download className="h-4 w-4" />
-                  ダウンロード
-                </Button>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="outline" onClick={onDownload} className="gap-2">
+                        <Download className="h-4 w-4" />
+                        ダウンロード
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>アルバムダウンロード機能は今後実装予定です</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               )}
             </div>
           </div>
