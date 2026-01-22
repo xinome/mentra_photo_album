@@ -121,8 +121,7 @@ const SharePage = () => {
   }, [token]);
 
   const handleDownload = () => {
-    alert("アルバムのダウンロードを開始します...");
-    // TODO: ダウンロード機能の実装
+    alert("アルバムダウンロード機能は今後実装予定です。");
   };
 
   const handleShare = async () => {

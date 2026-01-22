@@ -259,7 +259,9 @@ nvm use 20
 - [開発ガイド](docs/project/DEVELOPMENT_GUIDE.md) - Figma Make、Cursor、Supabase連携ガイド
 - [実装状況](docs/project/IMPLEMENTATION_STATUS.md) - 実装済み機能と未実装機能の一覧
 
-### 🚧 開発中・未実装
+### 🚧 今後実装予定
+
+以下の機能は現在開発中です。今後のアップデートで順次実装予定です。
 
 - 画像アップロードUI改善（ドラッグ&ドロップ）
 - いいね機能
