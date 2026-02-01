@@ -18,11 +18,16 @@ Vercel デプロイ・GitHub Actions・Supabase まわりの環境設定を整�
 **検証**
 - Magic Link 経由のログインがローカル環境で正常に動作することを確認
 
+### タスク2: Pre-Deploy Check のブランチ指定の見直し — 完了
+
+**実施内容**
+- 本番ブランチを `master` から `main` に移行する方針に合わせ、`.github/workflows/pre-deploy-check.yml` の `branches` を `main` に設定
+
 ---
 
 ## 🎯 背景
 
-- develop / master を SourceTree から PUSH すると Vercel でデプロイされる運用は問題なく動作している
+- develop / main を SourceTree から PUSH すると Vercel でデプロイされる運用は問題なく動作している
 - 以下の環境設定に改善・留意点があるため、タスク化して対応する
 
 ---
@@ -46,15 +51,14 @@ Vercel デプロイ・GitHub Actions・Supabase まわりの環境設定を整�
 
 ---
 
-### 2. Pre-Deploy Check のブランチ指定の見直し
+### 2. Pre-Deploy Check のブランチ指定の見直し ✅ 完了
 
 **現状**
-- `.github/workflows/pre-deploy-check.yml` は `main` ブランチ向けに設定されている
-- 本番で使用しているのが `master` の場合、このワークフローは「push to main / PR to main」のときしか動かない
+- `.github/workflows/pre-deploy-check.yml` は本番ブランチ向けに実行される必要がある
+- 本番ブランチを `main` に統一したため、`branches` を `main` に設定
 
 **対応内容**
-- 本番ブランチが `master` の場合は、`branches` を `master` に変更する
-- または `main` と `master` の両方で実行するようにする
+- `branches` を `main` に設定（master から main への移行に伴い更新済み）
 
 **変更ファイル**
 - `.github/workflows/pre-deploy-check.yml` - `on.push.branches` / `on.pull_request.branches` を実際の本番ブランチに合わせる
@@ -110,7 +114,7 @@ Vercel デプロイ・GitHub Actions・Supabase まわりの環境設定を整�
 | 優先度 | ファイル | 変更内容 |
 |--------|----------|----------|
 | 高 | `package.json` | Supabase トークンを削除し環境変数前提に ✅ |
-| 高 | `.github/workflows/pre-deploy-check.yml` | 本番ブランチ（main/master）の指定を実態に合わせる |
+| 高 | `.github/workflows/pre-deploy-check.yml` | 本番ブランチを main に設定 ✅ |
 | 高 | `.github/workflows/ci.yml` | `working-directory: apps/web` 削除、ルートで実行に変更 |
 | 中 | （将来）依存関係の整理 | `--legacy-peer-deps` が不要になるよう調整 |
 | 低 | （将来）認証まわり | `@supabase/ssr` への移行 |
@@ -130,7 +134,7 @@ Vercel デプロイ・GitHub Actions・Supabase まわりの環境設定を整�
 
 - [Vercel Promoting Deployments](https://vercel.com/docs/deployments/promoting-a-deployment)
 - [Vercel Instant Rollback](https://vercel.com/docs/instant-rollback)
-- 本番: develop → プレビュー、master → 本番デプロイの運用は継続
+- 本番: develop → プレビュー、main → 本番デプロイの運用
 
 ---
 
