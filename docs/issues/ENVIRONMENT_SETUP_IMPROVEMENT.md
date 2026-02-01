@@ -4,6 +4,22 @@
 
 Vercel デプロイ・GitHub Actions・Supabase まわりの環境設定を整理し、セキュリティ・CI/CD・運用の留意点に対応するためのタスク一覧です。
 
+## ✅ 実装状況
+
+### タスク1: Supabase アクセストークンの環境変数化 — 完了
+
+**実施内容**
+- `package.json` の supabase 系スクリプトから直書きトークンを削除
+- `.env.example` を新規作成（`SUPABASE_ACCESS_TOKEN` を含む）
+- `.gitignore` に `!.env.example` を追加
+- `README.md` に Supabase CLI 用トークンの設定手順を追記
+- `docs/setup/SETUP_GUIDE.md` / `SETUP_SUMMARY.md` の `.env.local.example` を `.env.example` に統一
+
+**検証**
+- Magic Link 経由のログインがローカル環境で正常に動作することを確認
+
+---
+
 ## 🎯 背景
 
 - develop / master を SourceTree から PUSH すると Vercel でデプロイされる運用は問題なく動作している
@@ -13,7 +29,7 @@ Vercel デプロイ・GitHub Actions・Supabase まわりの環境設定を整�
 
 ## ✅ 対応タスク一覧
 
-### 1. Supabase アクセストークンの環境変数化（重要・セキュリティ）
+### 1. Supabase アクセストークンの環境変数化（重要・セキュリティ） ✅ 完了
 
 **現状**
 - `package.json` の `supabase` 系スクリプトに `SUPABASE_ACCESS_TOKEN` が直書きされている
@@ -93,7 +109,7 @@ Vercel デプロイ・GitHub Actions・Supabase まわりの環境設定を整�
 
 | 優先度 | ファイル | 変更内容 |
 |--------|----------|----------|
-| 高 | `package.json` | Supabase トークンを削除し環境変数前提に |
+| 高 | `package.json` | Supabase トークンを削除し環境変数前提に ✅ |
 | 高 | `.github/workflows/pre-deploy-check.yml` | 本番ブランチ（main/master）の指定を実態に合わせる |
 | 高 | `.github/workflows/ci.yml` | `working-directory: apps/web` 削除、ルートで実行に変更 |
 | 中 | （将来）依存関係の整理 | `--legacy-peer-deps` が不要になるよう調整 |
@@ -103,7 +119,7 @@ Vercel デプロイ・GitHub Actions・Supabase まわりの環境設定を整�
 
 ## ✅ 検証項目
 
-- [ ] Supabase 系スクリプトがローカルで環境変数で動作すること
+- [x] Supabase 系スクリプトがローカルで環境変数で動作すること（Magic Link ログインで確認済み）
 - [ ] pre-deploy-check が本番ブランチへの push / PR で実行されること
 - [ ] ci ワークフローがルートでビルド・typecheck に成功すること
 - [ ] Vercel でのデプロイが従来どおり成功すること
