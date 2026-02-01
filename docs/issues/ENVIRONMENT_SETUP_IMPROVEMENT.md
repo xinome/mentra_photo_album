@@ -45,6 +45,16 @@ Vercel デプロイ・GitHub Actions・Supabase まわりの環境設定を整�
 **検証**
 - ローカルで `npm run type-check` が成功することを確認
 
+### npm ci に --legacy-peer-deps を追加（CI 失敗対応）— 完了
+
+**実施内容**
+- `vercel.json` の `installCommand: "npm install --legacy-peer-deps"` に合わせ、GitHub Actions の `npm ci` に `--legacy-peer-deps` を追加
+- `.github/workflows/ci.yml` および `.github/workflows/pre-deploy-check.yml` を更新
+
+**検証**
+- ローカルで `npm ci --legacy-peer-deps` → `npm run type-check` → `npm run build` が成功することを確認
+- `@supabase/auth-helpers-nextjs` 非推奨の警告ありつつもビルドは成功（対応2 @supabase/ssr 移行は**当面不要**）
+
 ---
 
 ## 🎯 背景
@@ -102,7 +112,18 @@ Vercel デプロイ・GitHub Actions・Supabase まわりの環境設定を整�
 
 ---
 
-### 4. Vercel の install コマンドと依存関係（参考）
+### 4. npm ci に --legacy-peer-deps を追加 ✅ 完了
+
+**現状**
+- Vercel は `installCommand: "npm install --legacy-peer-deps"` を使用している
+- GitHub Actions の `npm ci` は peer dependency の競合で失敗する場合がある
+
+**対応内容**
+- `ci.yml` および `pre-deploy-check.yml` の `npm ci` に `--legacy-peer-deps` を追加し、Vercel と統一
+
+---
+
+### 5. Vercel の install コマンドと依存関係（参考）
 
 **現状**
 - `vercel.json` で `installCommand: "npm install --legacy-peer-deps"` を指定している
@@ -114,7 +135,7 @@ Vercel デプロイ・GitHub Actions・Supabase まわりの環境設定を整�
 
 ---
 
-### 5. Supabase 認証パッケージの移行（将来対応）
+### 6. Supabase 認証パッケージの移行（将来対応）
 
 **現状**
 - `@supabase/auth-helpers-nextjs` は非推奨で、ビルド時に警告が出ている
@@ -137,6 +158,7 @@ Vercel デプロイ・GitHub Actions・Supabase まわりの環境設定を整�
 | 高 | `package.json` | Supabase トークンを削除し環境変数前提に ✅ |
 | 高 | `.github/workflows/pre-deploy-check.yml` | 本番ブランチを main に設定 ✅ |
 | 高 | `.github/workflows/ci.yml` | `working-directory: apps/web` 削除、ルートで実行に変更 ✅ |
+| 高 | `ci.yml` / `pre-deploy-check.yml` | `npm ci --legacy-peer-deps` を追加 ✅ |
 | 中 | （将来）依存関係の整理 | `--legacy-peer-deps` が不要になるよう調整 |
 | 低 | （将来）認証まわり | `@supabase/ssr` への移行 |
 
@@ -148,7 +170,8 @@ Vercel デプロイ・GitHub Actions・Supabase まわりの環境設定を整�
 - [x] master → main 移行完了（Git、GitHub、Vercel の設定を手順通り実施済み）
 - [x] main ブランチからの Production デプロイが成功すること（手動デプロイで確認済み）
 - [ ] pre-deploy-check が main 向け PR で実行されること
-- [x] ci ワークフローがルートでビルド・typecheck に成功すること（ローカル type-check 確認済み、CI 実行は次回 push で検証）
+- [x] ci ワークフローがルートでビルド・typecheck に成功すること
+- [x] npm ci --legacy-peer-deps でインストール・ビルドが成功すること（ローカルで確認済み）
 
 ---
 
