@@ -55,6 +55,16 @@ Vercel デプロイ・GitHub Actions・Supabase まわりの環境設定を整�
 - ローカルで `npm ci --legacy-peer-deps` → `npm run type-check` → `npm run build` が成功することを確認
 - `@supabase/auth-helpers-nextjs` 非推奨の警告ありつつもビルドは成功（対応2 @supabase/ssr 移行は**当面不要**）
 
+### CI 用 Supabase 環境変数のダミー設定 — 完了
+
+**実施内容**
+- GitHub Actions のビルド時、`NEXT_PUBLIC_SUPABASE_URL` と `NEXT_PUBLIC_SUPABASE_ANON_KEY` が未設定でプリレンダリングが失敗する問題を対応
+- 両ワークフローにダミー環境変数を追加（`https://placeholder.supabase.co` / `placeholder-anon-key-for-ci-build`）
+- `pre-deploy-check.yml` の Node.js を 18 → 20 に更新、actions/checkout@v4、actions/setup-node@v4 に統一
+
+**検証**
+- main への push で CI / Pre-Deploy Check が成功することを確認
+
 ---
 
 ## 🎯 背景

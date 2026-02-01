@@ -5,6 +5,9 @@ on: [push, pull_request]
 jobs:
   type-check-and-build:
     runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key-for-ci-build
 
     steps:
       - name: Checkout code
