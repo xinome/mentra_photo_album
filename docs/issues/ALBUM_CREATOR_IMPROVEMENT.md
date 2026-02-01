@@ -1,5 +1,7 @@
 # アルバム作成画面の改善と編集機能の実装
 
+> **GitHub Issue**: [#8](https://github.com/xinome/mentra_photo_album/issues/8)
+
 ## 📝 概要
 
 アルバム作成時の必須項目を最小限にし、ユーザーがより気軽にアルバムを作成できるように改善しました。

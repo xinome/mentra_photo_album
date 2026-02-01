@@ -65,6 +65,15 @@ git branch -a
 - [ ] `main` 向けの PR で Pre-Deploy Check が実行される
 - [ ] develop → main へのマージで本番デプロイが行われる
 
+## 📌 移行完了後の運用（main 統一）
+
+移行完了後は以下を `main` 前提で運用します：
+
+- **新規 Issue**: `main` ブランチのドキュメントを参照
+- **新規 PR**: ベースブランチは `main` を指定
+- **マージ先**: 本番反映は `main` へのマージで実施
+- **テンプレート**: `.github/PULL_REQUEST_TEMPLATE.md`、`.github/ISSUE_TEMPLATE/` は `main` 前提
+
 ## 📚 参考
 
 - [GitHub: Renaming a branch](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-branches-in-your-repository/renaming-a-branch)

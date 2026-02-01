@@ -1,3 +1,5 @@
+> GitHub Issue: #5, #7
+
 ## 📝 概要
 
 Figma Makeからの引き継ぎに基づき、Step 1の実装を完了しました。

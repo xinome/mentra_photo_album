@@ -1,5 +1,7 @@
 # 🔧 Function形式からアロー関数式へのリファクタリング
 
+> **GitHub Issue**: [#17](https://github.com/xinome/mentra_photo_album/issues/17)
+
 ## 🔧 リファクタリングの概要
 
 プロジェクト全体の関数定義を、従来の`function`形式からアロー関数式（arrow function）に統一します。コードの一貫性を向上させ、モダンなJavaScript/TypeScriptのスタイルに合わせます。

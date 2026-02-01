@@ -1,3 +1,5 @@
+> GitHub Issue: #19
+
 ## 📝 概要
 
 Vercel デプロイ・GitHub Actions・Supabase まわりの環境設定を整理し、セキュリティ・CI/CD・運用の留意点に対応するためのタスク一覧です。
@@ -131,7 +133,18 @@ Vercel デプロイ・GitHub Actions・Supabase まわりの環境設定を整�
 
 ---
 
-### 5. Vercel の install コマンドと依存関係（参考）
+### 5. CI 用 Supabase 環境変数のダミー設定 ✅ 完了
+
+**現状**
+- GitHub Actions のビルド時、`NEXT_PUBLIC_SUPABASE_URL` と `NEXT_PUBLIC_SUPABASE_ANON_KEY` が未設定でプリレンダリングが失敗する
+
+**対応内容**
+- 両ワークフローにダミー環境変数を追加（`https://placeholder.supabase.co` / `placeholder-anon-key-for-ci-build`）
+- `pre-deploy-check.yml` の Node.js を 18 → 20 に更新、actions/checkout@v4、actions/setup-node@v4 に統一
+
+---
+
+### 6. Vercel の install コマンドと依存関係（参考）
 
 **現状**
 - `vercel.json` で `installCommand: "npm install --legacy-peer-deps"` を指定している
@@ -143,7 +156,7 @@ Vercel デプロイ・GitHub Actions・Supabase まわりの環境設定を整�
 
 ---
 
-### 6. Supabase 認証パッケージの移行（将来対応）
+### 7. Supabase 認証パッケージの移行（将来対応）
 
 **現状**
 - `@supabase/auth-helpers-nextjs` は非推奨で、ビルド時に警告が出ている
@@ -167,6 +180,7 @@ Vercel デプロイ・GitHub Actions・Supabase まわりの環境設定を整�
 | 高 | `.github/workflows/pre-deploy-check.yml` | 本番ブランチを main に設定 ✅ |
 | 高 | `.github/workflows/ci.yml` | `working-directory: apps/web` 削除、ルートで実行に変更 ✅ |
 | 高 | `ci.yml` / `pre-deploy-check.yml` | `npm ci --legacy-peer-deps` を追加 ✅ |
+| 高 | `ci.yml` / `pre-deploy-check.yml` | Supabase 環境変数ダミー設定を追加 ✅ |
 | 中 | （将来）依存関係の整理 | `--legacy-peer-deps` が不要になるよう調整 |
 | 低 | （将来）認証まわり | `@supabase/ssr` への移行 |
 

@@ -1,3 +1,7 @@
+# ドキュメント整備: docs/配下の整理と整合性チェック
+
+> **GitHub Issue**: [#16](https://github.com/xinome/mentra_photo_album/issues/16)
+
 ## 📝 ドキュメント整備の概要
 
 docs/配下のドキュメントをカテゴライズして整理し、実装内容との整合性を確認・更新しました。また、開発者向けのナビゲーションドキュメント（README.md）を作成しました。

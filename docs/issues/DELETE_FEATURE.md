@@ -1,3 +1,7 @@
+# アルバム・写真削除機能の実装
+
+> **GitHub Issue**: [#14](https://github.com/xinome/mentra_photo_album/issues/14)
+
 ## ✨ 機能の概要
 
 アルバムと写真の削除機能を実装しました。権限チェックを実装し、作成者本人のみが削除できるようにしました。

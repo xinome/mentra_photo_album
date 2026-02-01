@@ -1,5 +1,7 @@
 # Step 1 実装完了: ダッシュボードとアルバム一覧の分離
 
+> **GitHub Issue**: [#5](https://github.com/xinome/mentra_photo_album/issues/5), [#7](https://github.com/xinome/mentra_photo_album/issues/7)
+
 ## 📝 概要
 
 Figma Makeからの引き継ぎに基づき、Step 1の実装を完了しました。

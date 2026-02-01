@@ -48,6 +48,8 @@ docs/
 │
 └── issues/               # GitHub Issue関連
     ├── TEMPLATE.md       # GitHub Issueテンプレート
+    ├── ISSUE_INDEX.md    # GitHub Issue 一覧・番号対応（main ブランチ移行後も番号維持）
+    ├── BRANCH_MAIN_NOTE.md  # Issue・PR の main ブランチ対応（本番ブランチ main 前提）
     ├── STEP1_IMPLEMENTATION.md
     ├── ALBUM_CREATOR_IMPROVEMENT.md
     ├── DELETE_FEATURE.md
