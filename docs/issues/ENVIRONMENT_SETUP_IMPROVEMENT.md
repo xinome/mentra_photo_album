@@ -1,0 +1,136 @@
+# 環境周りの調整（Vercel・GitHub Actions・Supabase）
+
+## 📝 概要
+
+Vercel デプロイ・GitHub Actions・Supabase まわりの環境設定を整理し、セキュリティ・CI/CD・運用の留意点に対応するためのタスク一覧です。
+
+## 🎯 背景
+
+- develop / master を SourceTree から PUSH すると Vercel でデプロイされる運用は問題なく動作している
+- 以下の環境設定に改善・留意点があるため、タスク化して対応する
+
+---
+
+## ✅ 対応タスク一覧
+
+### 1. Supabase アクセストークンの環境変数化（重要・セキュリティ）
+
+**現状**
+- `package.json` の `supabase` 系スクリプトに `SUPABASE_ACCESS_TOKEN` が直書きされている
+- リポジトリに含まれるため、push するとトークンが露出する
+
+**対応内容**
+- トークンを `package.json` から削除し、環境変数で渡すようにする
+  - ローカル: `.env` またはシェルで `export SUPABASE_ACCESS_TOKEN=...`
+  - CI: GitHub Secrets などで設定
+- すでに push 済みの場合は、Supabase ダッシュボードでトークンの再発行を検討する
+
+**変更ファイル**
+- `package.json` - supabase 系スクリプトからトークン参照を削除し、環境変数前提の記載に変更
+
+---
+
+### 2. Pre-Deploy Check のブランチ指定の見直し
+
+**現状**
+- `.github/workflows/pre-deploy-check.yml` は `main` ブランチ向けに設定されている
+- 本番で使用しているのが `master` の場合、このワークフローは「push to main / PR to main」のときしか動かない
+
+**対応内容**
+- 本番ブランチが `master` の場合は、`branches` を `master` に変更する
+- または `main` と `master` の両方で実行するようにする
+
+**変更ファイル**
+- `.github/workflows/pre-deploy-check.yml` - `on.push.branches` / `on.pull_request.branches` を実際の本番ブランチに合わせる
+
+---
+
+### 3. CI ワークフロー（ci.yml）のパス修正
+
+**現状**
+- `.github/workflows/ci.yml` は `working-directory: apps/web` を指定している
+- 本リポジトリはルートに `package.json` と `src/` がある構成で、`apps/web` は存在しない
+- このままでは CI の typecheck ジョブが失敗する
+
+**対応内容**
+- `working-directory: apps/web` を削除し、ルートで `npm` を実行する形に変更する
+- または pnpm を使わず、pre-deploy-check と同様に `npm ci` / `npm run build` に統一する
+
+**変更ファイル**
+- `.github/workflows/ci.yml` - `defaults.run.working-directory` の削除、および必要に応じて pnpm → npm の統一
+
+---
+
+### 4. Vercel の install コマンドと依存関係（参考）
+
+**現状**
+- `vercel.json` で `installCommand: "npm install --legacy-peer-deps"` を指定している
+- 依存の不整合を `--legacy-peer-deps` で吸収している状態
+
+**対応内容**
+- 必須ではないが、余裕があれば依存の整理（バージョン揃え・非推奨パッケージの置き換え）を検討する
+- ビルド時の `npm warn deprecated` 警告の解消は、このタイミングで検討可能
+
+---
+
+### 5. Supabase 認証パッケージの移行（将来対応）
+
+**現状**
+- `@supabase/auth-helpers-nextjs` は非推奨で、ビルド時に警告が出ている
+- 公式では `@supabase/ssr` への移行が推奨されている
+
+**対応内容**
+- 現状は動作しているため必須ではない
+- いずれ `@supabase/ssr` への移行を検討する
+
+**変更ファイル（将来）**
+- 認証まわりで `@supabase/auth-helpers-nextjs` を参照しているファイル一式
+- `package.json` - 依存の差し替え
+
+---
+
+## 📁 変更ファイルまとめ
+
+| 優先度 | ファイル | 変更内容 |
+|--------|----------|----------|
+| 高 | `package.json` | Supabase トークンを削除し環境変数前提に |
+| 高 | `.github/workflows/pre-deploy-check.yml` | 本番ブランチ（main/master）の指定を実態に合わせる |
+| 高 | `.github/workflows/ci.yml` | `working-directory: apps/web` 削除、ルートで実行に変更 |
+| 中 | （将来）依存関係の整理 | `--legacy-peer-deps` が不要になるよう調整 |
+| 低 | （将来）認証まわり | `@supabase/ssr` への移行 |
+
+---
+
+## ✅ 検証項目
+
+- [ ] Supabase 系スクリプトがローカルで環境変数で動作すること
+- [ ] pre-deploy-check が本番ブランチへの push / PR で実行されること
+- [ ] ci ワークフローがルートでビルド・typecheck に成功すること
+- [ ] Vercel でのデプロイが従来どおり成功すること
+
+---
+
+## 📚 関連
+
+- [Vercel Promoting Deployments](https://vercel.com/docs/deployments/promoting-a-deployment)
+- [Vercel Instant Rollback](https://vercel.com/docs/instant-rollback)
+- 本番: develop → プレビュー、master → 本番デプロイの運用は継続
+
+---
+
+## 📌 GitHub Issue の作成方法
+
+この内容で GitHub Issue を作成する場合:
+
+1. リポジトリの **Issues** タブを開く
+2. **New issue** をクリック
+3. **タイトル**: `環境周りの調整（Vercel・GitHub Actions・Supabase）`
+4. **本文**: `docs/issues/ENVIRONMENT_SETUP_IMPROVEMENT_BODY.txt` の内容をコピー＆ペースト
+5. **ラベル**: `enhancement` を付与（任意）
+6. **Create issue** で作成
+
+または、GitHub CLI が利用可能な環境では:
+
+```bash
+gh issue create --title "環境周りの調整（Vercel・GitHub Actions・Supabase）" --body-file docs/issues/ENVIRONMENT_SETUP_IMPROVEMENT_BODY.txt --label "enhancement"
+```

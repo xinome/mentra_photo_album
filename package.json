@@ -9,10 +9,10 @@
     "lint": "eslint",
     "type-check": "tsc --noEmit",
     "pre-deploy": "npm run type-check && npm run build",
-    "supabase": "export SUPABASE_ACCESS_TOKEN=sbp_89281200da2525c59a9afbe08016f5d748df1e38 && npx supabase",
-    "supabase:status": "export SUPABASE_ACCESS_TOKEN=sbp_89281200da2525c59a9afbe08016f5d748df1e38 && npx supabase status",
-    "supabase:projects": "export SUPABASE_ACCESS_TOKEN=sbp_89281200da2525c59a9afbe08016f5d748df1e38 && npx supabase projects list",
-    "supabase:types": "export SUPABASE_ACCESS_TOKEN=sbp_89281200da2525c59a9afbe08016f5d748df1e38 && npx supabase gen types typescript --linked > src/types/supabase.ts"
+    "supabase": "npx supabase",
+    "supabase:status": "npx supabase status",
+    "supabase:projects": "npx supabase projects list",
+    "supabase:types": "npx supabase gen types typescript --linked > src/types/supabase.ts"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.3",

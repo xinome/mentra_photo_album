@@ -45,10 +45,10 @@ npm install
 
 ### 3. 環境変数を設定
 
-`.env.local.example`をコピーして`.env.local`を作成：
+`.env.example`をコピーして`.env.local`を作成：
 
 ```bash
-cp .env.local.example .env.local
+cp .env.example .env.local
 ```
 
 `.env.local`を編集して、SupabaseのプロジェクトURLとAPIキーを設定：
@@ -61,6 +61,10 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
 **APIキーの取得方法**:
 1. [Supabase Dashboard](https://supabase.com/dashboard)でプロジェクトを開く
 2. Settings > API から`Project URL`と`anon public`キーをコピー
+
+**Supabase CLI を使う場合**（`npm run supabase` / `supabase:types` など）:
+- `SUPABASE_ACCESS_TOKEN` を環境変数で設定してください（トークンは [Account > Access Tokens](https://supabase.com/dashboard/account/tokens) で発行）
+- ローカルでは `.env.local` に `SUPABASE_ACCESS_TOKEN=...` を追加し、コマンド実行前に `source .env.local`（bash）で読み込むか、ターミナルで `export SUPABASE_ACCESS_TOKEN=...` してから実行してください
 
 **⚠️ 重要: Magic Link認証のリダイレクトURL設定**
 

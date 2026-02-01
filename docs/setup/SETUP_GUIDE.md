@@ -16,10 +16,10 @@ npm install
 
 ### 2. 環境変数の設定
 
-`.env.local.example`をコピーして`.env.local`を作成します：
+`.env.example`をコピーして`.env.local`を作成します：
 
 ```bash
-cp .env.local.example .env.local
+cp .env.example .env.local
 ```
 
 #### オプションA: リモートSupabaseを使用（推奨・現在の設定）
@@ -203,7 +203,7 @@ mentra_photo_album/
 │   ├── sql/                   # SQLスクリプト
 │   └── functions/             # Edge Functions
 ├── .env.local                 # 環境変数（gitignore）
-└── .env.local.example         # 環境変数テンプレート
+└── .env.example               # 環境変数テンプレート
 ```
 
 ## 主要な機能

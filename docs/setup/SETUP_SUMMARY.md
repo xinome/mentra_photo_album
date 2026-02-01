@@ -75,7 +75,7 @@ SQLエラー「column "user_id" does not exist」が発生する問題に対し�
 
 1. **環境変数設定**
    ```bash
-   cp .env.local.example .env.local
+   cp .env.example .env.local
    # .env.local を編集して Supabase URL と API キーを設定
    ```
 
