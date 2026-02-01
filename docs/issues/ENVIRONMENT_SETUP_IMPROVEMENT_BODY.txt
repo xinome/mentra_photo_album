@@ -21,6 +21,28 @@ Vercel デプロイ・GitHub Actions・Supabase まわりの環境設定を整�
 **実施内容**
 - 本番ブランチを `master` から `main` に移行する方針に合わせ、`.github/workflows/pre-deploy-check.yml` の `branches` を `main` に設定
 
+### master → main ブランチ移行 — 完了
+
+**実施内容**
+- プロジェクト内の `main` 前提ファイルを更新（pre-deploy-check.yml、ドキュメント類）
+- `docs/development/BRANCH_MAIN_MIGRATION.md` を新規作成（移行手順書）
+- Git: ローカルで `master` を `main` にリネームし push
+- GitHub: デフォルトブランチを `main` に変更
+- Vercel: Settings → Environments → Production の **Branch Tracking** を `main` に変更
+
+**検証**
+- 手動で `main` ブランチから Production デプロイを実行し、正常に動作することを確認
+
+### タスク3: CI ワークフロー（ci.yml）のパス修正 — 完了
+
+**実施内容**
+- `working-directory: apps/web` を削除し、ルートで実行する形に変更
+- pnpm から npm に統一（pre-deploy-check と同様に `npm ci` / `npm run type-check` / `npm run build`）
+- Node.js 20、actions/checkout@v4、actions/setup-node@v4 を使用
+
+**検証**
+- ローカルで `npm run type-check` が成功することを確認
+
 ---
 
 ## 🎯 背景
@@ -63,19 +85,18 @@ Vercel デプロイ・GitHub Actions・Supabase まわりの環境設定を整�
 
 ---
 
-### 3. CI ワークフロー（ci.yml）のパス修正
+### 3. CI ワークフロー（ci.yml）のパス修正 ✅ 完了
 
 **現状**
-- `.github/workflows/ci.yml` は `working-directory: apps/web` を指定している
+- `.github/workflows/ci.yml` は `working-directory: apps/web` を指定していた
 - 本リポジトリはルートに `package.json` と `src/` がある構成で、`apps/web` は存在しない
-- このままでは CI の typecheck ジョブが失敗する
 
 **対応内容**
-- `working-directory: apps/web` を削除し、ルートで `npm` を実行する形に変更する
-- または pnpm を使わず、pre-deploy-check と同様に `npm ci` / `npm run build` に統一する
+- `working-directory: apps/web` を削除し、ルートで実行する形に変更
+- pnpm から npm に統一（pre-deploy-check と同様）
 
 **変更ファイル**
-- `.github/workflows/ci.yml` - `defaults.run.working-directory` の削除、および必要に応じて pnpm → npm の統一
+- `.github/workflows/ci.yml` - `defaults.run.working-directory` 削除、pnpm → npm 統一
 
 ---
 
@@ -113,7 +134,7 @@ Vercel デプロイ・GitHub Actions・Supabase まわりの環境設定を整�
 |--------|----------|----------|
 | 高 | `package.json` | Supabase トークンを削除し環境変数前提に ✅ |
 | 高 | `.github/workflows/pre-deploy-check.yml` | 本番ブランチを main に設定 ✅ |
-| 高 | `.github/workflows/ci.yml` | `working-directory: apps/web` 削除、ルートで実行に変更 |
+| 高 | `.github/workflows/ci.yml` | `working-directory: apps/web` 削除、ルートで実行に変更 ✅ |
 | 中 | （将来）依存関係の整理 | `--legacy-peer-deps` が不要になるよう調整 |
 | 低 | （将来）認証まわり | `@supabase/ssr` への移行 |
 
@@ -122,9 +143,10 @@ Vercel デプロイ・GitHub Actions・Supabase まわりの環境設定を整�
 ## ✅ 検証項目
 
 - [x] Supabase 系スクリプトがローカルで環境変数で動作すること（Magic Link ログインで確認済み）
-- [ ] pre-deploy-check が本番ブランチへの push / PR で実行されること
-- [ ] ci ワークフローがルートでビルド・typecheck に成功すること
-- [ ] Vercel でのデプロイが従来どおり成功すること
+- [x] master → main 移行完了（Git、GitHub、Vercel の設定を手順通り実施済み）
+- [x] main ブランチからの Production デプロイが成功すること（手動デプロイで確認済み）
+- [ ] pre-deploy-check が main 向け PR で実行されること
+- [x] ci ワークフローがルートでビルド・typecheck に成功すること（ローカル type-check 確認済み、CI 実行は次回 push で検証）
 
 ---
 
