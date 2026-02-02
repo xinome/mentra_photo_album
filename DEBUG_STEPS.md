@@ -1,9 +1,24 @@
 # アルバムページ接続エラーのデバッグ手順
 
 ## エラー内容
+
+### アプリ起因の可能性があるエラー
 ```
 Uncaught (in promise) Error: Could not establish connection. Receiving end does not exist.
 ```
+
+### コンソールによく出る「拡張機能由来」のエラー（アプリの不具合ではない）
+
+次のメッセージは **ブラウザ拡張機能** が原因で、**本アプリのコードとは無関係** です。
+
+- `Unchecked runtime.lastError: The message port closed before a response was received.`
+- `chrome-extension://...-worker-loader.js: Uncaught (in promise) Error: Could not establish connection. Receiving end does not exist.`
+
+**理由:** 拡張機能が `chrome.runtime.sendMessage` などでページやワーカーにメッセージを送った際に、受け側がまだ存在しない・応答しなかった・ポートが閉じた場合に Chrome が表示します。本アプリでは `chrome.*` や拡張 API は一切使っていません。
+
+**対処:** 無視して問題ありません。気になる場合はシークレットモードで開くか、`chrome://extensions/` で拡張を一つずつ無効化して原因の拡張を特定してください（React DevTools・Redux DevTools・広告ブロッカー・Grammarly などで出ることが多いです）。
+
+---
 
 ## 🔍 原因の特定
 
