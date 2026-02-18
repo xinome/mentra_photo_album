@@ -3,3 +3,4 @@ topics: []
 published: false
 price: 0
 chapters: []
+allow_override: true
